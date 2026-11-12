@@ -26,6 +26,14 @@ npm run security:test -w @yunling/backend
 npm run dev:api
 ```
 
+Windows PowerShell 如果提示 `npm.ps1` 被系统禁止运行，把命令中的 `npm` 改成 `npm.cmd` 即可，不需要修改执行策略：
+
+```powershell
+npm.cmd run migrate -w @yunling/backend
+npm.cmd run security:test -w @yunling/backend
+npm.cmd run dev:api
+```
+
 启动后可用 `npm run accept` 运行 43 项后端验收。
 
 ## 环境变量
