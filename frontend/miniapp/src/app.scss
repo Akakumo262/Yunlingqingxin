@@ -1,0 +1,182 @@
+/* 设计令牌：与 frontend/design/tokens.ts 同值，用 SCSS 变量（小程序与 H5 都稳）。尺寸按 750 设计稿书写，Taro 自动换算。
+   注意：TSX 行内样式不会被换算，那里写的是真实像素，颜色直接写色值。 */
+$indigo-900: #14264d;
+$indigo-700: #1e3a7b;
+$lake-600: #1f5fd1;
+$lake-500: #3b7bea;
+$lake-300: #a8c3ee;
+$lake-100: #e3edfc;
+$lake-50: #f1f6fe;
+$rape: #ffc83d;
+$rape-100: #fff3cf;
+$rape-ink: #7a5500;
+$camellia: #d9366b;
+$camellia-100: #fce4ec;
+$pine: #14876b;
+$pine-100: #ddf3ec;
+$ink: #0f1e3a;
+$ink-2: #4a5878;
+$ink-3: #8590a8;
+$sky: #f3f6fb;
+$card: #fff;
+$line: #dfe5f0;
+
+page, body, .taro_page {
+  background: $sky; color: $ink;
+  font-family: 'HarmonyOS Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 30px; line-height: 1.6;
+}
+.num { font-family: 'DIN Alternate', 'Bahnschrift', 'HarmonyOS Sans SC', sans-serif; }
+.muted { color: $ink-2; font-size: 26px; }
+.faint { color: $ink-3; font-size: 24px; }
+.h1 { font-size: 52px; line-height: 1.25; font-weight: 700; }
+.h2 { font-size: 34px; font-weight: 700; }
+.page { padding: 32px 32px 64px; min-height: 100vh; box-sizing: border-box; }
+.page--bar { padding-bottom: calc(180px + env(safe-area-inset-bottom)); }
+.stack > .card + .card, .stack > .card + .btn, .stack > .btn + .card { margin-top: 24px; }
+.section-title { display: flex; justify-content: space-between; align-items: baseline; margin: 48px 4px 20px; }
+.section-title .more { color: $lake-600; font-size: 26px; }
+
+.card { background: $card; border-radius: 36px; padding: 32px; }
+.card--tint { background: $lake-50; }
+.card--indigo { background: $indigo-900; color: #fff; }
+.chip { display: inline-block; padding: 8px 24px; border-radius: 999px; background: $lake-50; color: $indigo-700; font-size: 24px; margin: 0 12px 12px 0; white-space: nowrap; }
+.chip--on { background: $indigo-900; color: #fff; }
+.chip--rape { background: $rape-100; color: $rape-ink; }
+.btn { background: $lake-600; color: #fff; border-radius: 999px; text-align: center; padding: 26px 0; font-size: 32px; font-weight: 600; }
+.btn--ghost { background: $lake-50; color: $lake-600; }
+.btn--help { background: $camellia-100; color: $camellia; }
+.btn--off { opacity: 0.4; }
+.link { color: $lake-600; }
+.row { display: flex; align-items: center; }
+.row > .grow { flex: 1; min-width: 0; }
+.icon { width: 44px; height: 44px; flex-shrink: 0; }
+.list-item { display: flex; align-items: center; padding: 28px 0; border-top: 1px solid $line; }
+.list-item:first-child { border-top: 0; padding-top: 0; }
+.list-item:last-child { padding-bottom: 0; }
+.list-item .grow { flex: 1; min-width: 0; margin-right: 16px; }
+.ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.field { background: $sky; border-radius: 24px; padding: 24px 28px; font-size: 30px; width: 100%; box-sizing: border-box; }
+.notice { background: $rape-100; color: $rape-ink; border-radius: 24px; padding: 20px 24px; font-size: 26px; }
+
+/* ── 底部导航 ── */
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; background: rgba(255, 255, 255, 0.96); border-top: 1px solid $line; padding: 14px 0 calc(14px + env(safe-area-inset-bottom)); }
+.tabbar__item { flex: 1; text-align: center; font-size: 22px; color: $ink-3; }
+.tabbar__item image, .tabbar__item img { width: 52px; height: 52px; display: block; margin: 0 auto 4px; }
+.tabbar__item--on { color: $indigo-900; font-weight: 700; }
+
+/* ── 心情天气：首页主视觉 ── */
+.sky { position: relative; height: 660px; overflow: hidden; background: linear-gradient(180deg, #6fb0ff 0%, #c4dfff 68%, #e9f3ff 100%); }
+.sky--great { background: linear-gradient(180deg, #3f97ff 0%, #a9d4ff 68%, #e3f1ff 100%); }
+.sky--okay { background: linear-gradient(180deg, #8fa5c8 0%, #c9d5e8 68%, #e8eef7 100%); }
+.sky--low { background: linear-gradient(180deg, #5e7fb5 0%, #a9bedd 68%, #dce6f3 100%); }
+.sky--hard { background: linear-gradient(180deg, #2a3d6b 0%, #6c83b0 68%, #b9c7e0 100%); }
+.sky__text { position: relative; z-index: 3; padding: 0 40px; color: #fff; }
+.sky__text .date { font-size: 26px; opacity: 0.9; }
+.sky__text .h1 { margin-top: 8px; white-space: pre-line; text-shadow: 0 2px 12px rgba(20, 38, 77, 0.18); }
+.sky__text .sub { font-size: 28px; opacity: 0.95; margin-top: 8px; }
+.sky__sun { position: absolute; right: 80px; top: 250px; width: 140px; height: 140px; border-radius: 50%; background: $rape; box-shadow: 0 0 0 32px rgba(255, 200, 61, 0.25), 0 0 0 76px rgba(255, 200, 61, 0.12); transition: transform 0.7s ease, opacity 0.5s; }
+.sky--great .sky__sun { transform: translate(-30px, -40px) scale(1.25); }
+.sky--okay .sky__sun, .sky--low .sky__sun, .sky--hard .sky__sun { opacity: 0; transform: translateY(80px); }
+.cloud { position: absolute; width: 220px; height: 64px; border-radius: 64px; background: #fff; opacity: 0; transition: transform 0.7s ease, opacity 0.5s; }
+.cloud::before, .cloud::after { content: ''; position: absolute; border-radius: 50%; background: inherit; }
+.cloud::before { left: 36px; top: -40px; width: 92px; height: 92px; }
+.cloud::after { left: 108px; top: -24px; width: 72px; height: 72px; }
+.cloud--a { right: 30px; top: 300px; transform: translateX(120px); }
+.cloud--b { left: 60px; top: 360px; transform: translateX(-120px) scale(0.8); }
+.sky--good .cloud--a, .sky--okay .cloud, .sky--low .cloud, .sky--hard .cloud { opacity: 0.95; transform: none; }
+.sky--okay .cloud--b, .sky--low .cloud--b, .sky--hard .cloud--b { transform: scale(0.8); }
+.sky--low .cloud, .sky--hard .cloud { background: #dfe7f3; }
+.sky--hard .cloud { background: #b4c0d8; }
+.sky__rain { position: absolute; left: 0; right: 0; top: 330px; bottom: 0; opacity: 0; transition: opacity 0.5s; background-image: repeating-linear-gradient(104deg, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0) 30px, rgba(255, 255, 255, 0.5) 30px, rgba(255, 255, 255, 0.5) 33px); }
+.sky--low .sky__rain { opacity: 0.6; }
+.sky--hard .sky__rain { opacity: 1; }
+.ridge { position: absolute; left: 0; right: 0; bottom: 0; }
+.ridge--far { height: 280px; background: $lake-300; clip-path: polygon(0 100%, 0 58%, 14% 30%, 26% 52%, 40% 8%, 54% 44%, 66% 26%, 80% 56%, 92% 36%, 100% 50%, 100% 100%); }
+.ridge--mid { height: 210px; background: $lake-500; clip-path: polygon(0 100%, 0 46%, 18% 16%, 32% 50%, 48% 20%, 64% 58%, 80% 26%, 100% 62%, 100% 100%); }
+.ridge--near { height: 130px; background: $indigo-700; clip-path: polygon(0 100%, 0 60%, 22% 24%, 46% 62%, 70% 18%, 100% 58%, 100% 100%); }
+.sky--low .ridge--far, .sky--hard .ridge--far { background: #8aa3cf; }
+.sky--hard .ridge--mid { background: #3a5a9d; }
+
+.weather-card { position: relative; z-index: 4; margin: -96px 32px 0; }
+.weather-row { display: flex; justify-content: space-between; }
+.weather-pick { width: 116px; text-align: center; font-size: 22px; color: $ink-2; padding: 12px 0; border-radius: 28px; }
+.weather-pick image, .weather-pick img { width: 80px; height: 80px; display: block; margin: 0 auto 6px; }
+.weather-pick--on { background: $lake-50; color: $indigo-900; font-weight: 700; }
+.week { display: flex; justify-content: space-between; margin-top: 8px; }
+.week__day { width: 76px; text-align: center; font-size: 22px; color: $ink-3; }
+.week__day image, .week__day img { width: 52px; height: 52px; display: block; margin: 0 auto 4px; }
+.week__day .none { width: 16px; height: 16px; border-radius: 50%; background: $line; margin: 18px auto 22px; }
+.week__day--today { color: $indigo-900; font-weight: 700; }
+
+/* ── 内容 ── */
+.poster { position: relative; height: 340px; border-radius: 32px; overflow: hidden; background: linear-gradient(160deg, $lake-500, $indigo-900); }
+.poster--rape { background: linear-gradient(160deg, #ffd96b, #f0a01e); }
+.poster--pine { background: linear-gradient(160deg, #3fb596, #0d5c4a); }
+.poster--camellia { background: linear-gradient(160deg, #f07aa0, #a8224f); }
+.poster .ridge--near { height: 150px; background: rgba(255, 255, 255, 0.16); }
+.poster .ridge--mid { height: 220px; background: rgba(255, 255, 255, 0.1); }
+.poster__play { position: absolute; left: 32px; bottom: 32px; width: 88px; height: 88px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; }
+.poster__play image, .poster__play img { width: 44px; height: 44px; margin-left: 6px; }
+.poster__len { position: absolute; right: 28px; bottom: 32px; color: #fff; font-size: 24px; background: rgba(15, 30, 58, 0.45); padding: 4px 16px; border-radius: 999px; }
+.poster__tag { position: absolute; left: 28px; top: 28px; color: #fff; font-size: 22px; background: rgba(15, 30, 58, 0.35); padding: 4px 16px; border-radius: 999px; }
+.thumb { width: 132px; height: 132px; border-radius: 28px; flex-shrink: 0; margin-right: 24px; position: relative; overflow: hidden; background: linear-gradient(160deg, $lake-500, $indigo-900); }
+.thumb .ridge--near { height: 60px; background: rgba(255, 255, 255, 0.2); }
+.hscroll { white-space: nowrap; margin: 0 -32px; padding: 0 32px; }
+.career { display: inline-block; vertical-align: top; width: 300px; height: 360px; border-radius: 36px; padding: 28px; margin-right: 20px; box-sizing: border-box; white-space: normal; color: #fff; position: relative; overflow: hidden; }
+.career--job { background: $indigo-900; } .career--industry { background: $pine; } .career--major { background: $lake-600; } .career--person { background: #b36a00; }
+.career .kind { font-size: 22px; opacity: 0.8; }
+.career .name { font-size: 40px; font-weight: 700; line-height: 1.25; margin-top: 8px; }
+.career .tagline { position: absolute; left: 28px; right: 28px; bottom: 28px; font-size: 24px; opacity: 0.92; }
+.prose { font-size: 32px; line-height: 1.95; }
+.prose .p { margin-bottom: 32px; }
+.source { border-top: 1px solid $line; padding-top: 24px; margin-top: 16px; }
+
+/* ── 助手 ── */
+.chat { display: flex; flex-direction: column; }
+.bubble { max-width: 84%; padding: 22px 28px; border-radius: 32px; margin-bottom: 20px; white-space: pre-wrap; }
+.bubble--me { align-self: flex-end; background: $lake-600; color: #fff; border-bottom-right-radius: 8px; }
+.bubble--ai { align-self: flex-start; background: $card; border-bottom-left-radius: 8px; }
+.bubble--crisis { align-self: stretch; max-width: 100%; background: $camellia-100; color: #7d1238; }
+.src { display: inline-block; margin: 14px 12px 0 0; padding: 4px 18px; border-radius: 999px; background: $lake-50; color: $lake-600; font-size: 24px; }
+.composer { position: fixed; left: 0; right: 0; bottom: 0; z-index: 15; display: flex; align-items: center; padding: 16px 24px calc(16px + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid $line; }
+.composer--tab { bottom: calc(116px + env(safe-area-inset-bottom)); padding-bottom: 16px; }
+.composer .field { flex: 1; margin-right: 16px; padding: 18px 28px; }
+.composer .send { width: 84px; height: 84px; border-radius: 50%; background: $lake-600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.composer .send image, .composer .send img { width: 40px; height: 40px; }
+
+/* ── 成长护照 ── */
+.passport { background: $indigo-900; color: #fff; border-radius: 40px; padding: 40px 36px 36px; position: relative; overflow: hidden; }
+.passport .ridge--near { height: 120px; background: rgba(255, 255, 255, 0.07); }
+.passport__kicker { font-size: 24px; letter-spacing: 8px; color: $rape; }
+.passport__name { font-size: 56px; font-weight: 700; margin-top: 4px; }
+.stamps { display: flex; justify-content: space-between; margin-top: 36px; position: relative; z-index: 1; }
+.stamp { width: 108px; height: 108px; border-radius: 50%; border: 4px dashed currentColor; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
+.stamp .edu { font-size: 36px; font-weight: 700; }
+.stamp .n { font-size: 22px; }
+.stamp--0 { color: #ff9fbd; transform: rotate(-8deg); } .stamp--1 { color: #9cc2ff; transform: rotate(5deg); } .stamp--2 { color: $rape; transform: rotate(-3deg); }
+.stamp--3 { color: #c9b6ff; transform: rotate(7deg); } .stamp--4 { color: #7fe0c0; transform: rotate(-6deg); }
+.record { position: relative; padding: 0 0 36px 48px; border-left: 4px solid $line; margin-left: 16px; }
+.record:last-child { padding-bottom: 0; border-left-color: transparent; }
+.record::before { content: ''; position: absolute; left: -14px; top: 12px; width: 20px; height: 20px; border-radius: 50%; background: $card; border: 4px solid $lake-600; }
+.quote { border-left: 8px solid $rape; padding-left: 24px; margin-top: 24px; }
+
+/* ── 成长圈 ── */
+.avatar { width: 80px; height: 80px; border-radius: 50%; margin-right: 20px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 32px; font-weight: 700; }
+.reply { background: $sky; border-radius: 24px; padding: 20px 24px; margin-top: 16px; font-size: 28px; }
+
+/* ── 问卷 ── */
+.progress { height: 12px; border-radius: 6px; background: $line; overflow: hidden; }
+.progress__bar { height: 100%; background: $lake-600; border-radius: 6px; transition: width 0.3s; }
+.option { border: 3px solid $line; background: $card; border-radius: 28px; padding: 28px 32px; margin-top: 20px; }
+.option--on { border-color: $lake-600; background: $lake-50; color: $indigo-900; font-weight: 600; }
+.fun { background: $rape-100; }
+.fun .h2 { color: $rape-ink; }
+
+/* ── 求助 ── */
+.help-opt { display: flex; align-items: center; background: $card; border-radius: 36px; padding: 32px; margin-top: 24px; border: 3px solid transparent; }
+.help-opt--done { border-color: $pine; background: $pine-100; }
+.help-opt .badge { width: 88px; height: 88px; border-radius: 28px; background: $lake-50; display: flex; align-items: center; justify-content: center; margin-right: 24px; flex-shrink: 0; }
+.help-opt .badge--hot { background: $camellia-100; }
+
+/* 横向滚动区不显示滚动条 */
+.hscroll ::-webkit-scrollbar, .hscroll::-webkit-scrollbar { display: none; width: 0; height: 0; }

@@ -1,0 +1,32 @@
+{
+  "name": "@yunling/backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "nest start --watch",
+    "build": "nest build",
+    "start": "node dist/main.js",
+    "migrate": "node-pg-migrate up -m migrations --migration-file-language sql -d MIGRATE_DATABASE_URL"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/platform-fastify": "^11.0.0",
+    "@yunling/contracts": "*",
+    "jsonwebtoken": "^9.0.2",
+    "kysely": "^0.27.4",
+    "pg": "^8.13.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.0",
+    "@nestjs/schematics": "^11.0.0",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^22.9.0",
+    "@types/pg": "^8.11.10",
+    "node-pg-migrate": "^7.8.0",
+    "typescript": "^5.6.3"
+  }
+}

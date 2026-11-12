@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+.env.local
+*.log
+.DS_Store
+.swc/
+.temp/
+# 演示素材不得入库（见《技术路径》19.11.1）
+demo-assets/

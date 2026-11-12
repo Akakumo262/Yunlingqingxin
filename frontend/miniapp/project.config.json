@@ -1,0 +1,8 @@
+{
+  "miniprogramRoot": "dist/weapp/",
+  "projectname": "yunling-miniapp",
+  "description": "云岭青心 学生/家长端",
+  "appid": "touristappid",
+  "setting": { "urlCheck": false, "es6": false, "enhance": false, "postcss": false, "minified": false },
+  "compileType": "miniprogram"
+}

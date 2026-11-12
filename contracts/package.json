@@ -1,0 +1,19 @@
+{
+  "name": "@yunling/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "前后端唯一契约：枚举、路由表、请求/响应类型。改这里之前先改 docs/前后端对齐契约.md。",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "mock": "node tools/mock-server.cjs",
+    "accept": "node tools/accept.cjs"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

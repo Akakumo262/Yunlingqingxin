@@ -1,0 +1,23 @@
+{
+  "name": "yunling-qingxin",
+  "private": true,
+  "version": "0.1.0",
+  "description": "云岭青心 · 青少年成长学习与资源协同平台（G0 软著版骨架）",
+  "workspaces": [
+    "contracts",
+    "backend",
+    "frontend/web"
+  ],
+  "scripts": {
+    "build:contracts": "npm run build -w @yunling/contracts",
+    "dev:api": "npm run build:contracts && npm run dev -w @yunling/backend",
+    "dev:web": "npm run dev -w @yunling/web",
+    "dev:miniapp": "npm run build:contracts && npm --prefix frontend/miniapp run dev:h5",
+    "build": "npm run build:contracts && npm run build -w @yunling/backend && npm run build -w @yunling/web",
+    "mock": "npm run build:contracts && npm run mock -w @yunling/contracts",
+    "accept": "npm run build:contracts && npm run accept -w @yunling/contracts"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
