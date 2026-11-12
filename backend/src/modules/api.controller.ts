@@ -1,4 +1,4 @@
-import { All, Controller, Req, Res } from '@nestjs/common';
+import { All, Controller, OnModuleInit, Req, Res } from '@nestjs/common';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import * as jwt from 'jsonwebtoken';
 import { createMock, fixtures, matchRoute, type RouteName, type TokenPair } from '@yunling/contracts';
@@ -16,11 +16,31 @@ import { RuntimePersistence } from '../infra/runtime-persistence';
  * PostgreSQL 仓储而无需改变前端契约。
  */
 @Controller()
-export class ApiController {
+export class ApiController implements OnModuleInit {
   private readonly service = createMock();
   private readonly refreshTokens = new Map<string, string>();
+  private replaying = false;
 
   constructor(private readonly persistence: RuntimePersistence) {}
+
+  async onModuleInit() {
+    const commands = await this.persistence.loadCommands();
+    if (!commands.length) return;
+    this.replaying = true;
+    try {
+      for (const command of commands) {
+        this.service.call(command.routeName as RouteName, {
+          token: command.token,
+          purpose: command.purpose,
+          params: command.params,
+          query: command.query,
+          body: command.body,
+        });
+      }
+    } finally {
+      this.replaying = false;
+    }
+  }
 
   @All('*')
   async dispatch(@Req() req: FastifyRequest, @Res() reply: FastifyReply) {
@@ -46,6 +66,18 @@ export class ApiController {
       requestId: String((req as FastifyRequest & { id?: string }).id ?? ''),
       token: headers.authorization,
     });
+
+    if (!this.replaying && result.status < 400 && ['POST', 'PATCH', 'DELETE'].includes(String(req.method).toUpperCase()) && !this.isLoginRoute(matched.name)) {
+      void this.persistence.recordCommand({
+        routeName: matched.name,
+        method: String(req.method).toUpperCase(),
+        token: internalToken,
+        purpose: headers['x-purpose-code'],
+        params: matched.params,
+        query: (req.query ?? {}) as Record<string, unknown>,
+        body: req.body,
+      });
+    }
 
     const body = result.status < 400 && this.isLoginRoute(matched.name) ? this.issueJwt(result.body as TokenPair) : result.body;
     reply.header('content-type', result.status >= 400 ? 'application/problem+json' : 'application/json; charset=utf-8');

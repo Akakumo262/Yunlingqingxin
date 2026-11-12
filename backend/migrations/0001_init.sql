@@ -5,7 +5,8 @@
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
-CREATE EXTENSION IF NOT EXISTS vector;
+-- pgvector 在 Docker 镜像中可用；原生 PostgreSQL 安装没有该扩展时，
+-- 使用 jsonb 保存嵌入，检索层可先走关键词，再按需启用 pgvector。
 
 CREATE SCHEMA iam; CREATE SCHEMA org; CREATE SCHEMA asm; CREATE SCHEMA rsk;
 CREATE SCHEMA col; CREATE SCHEMA cnt; CREATE SCHEMA com; CREATE SCHEMA ai; CREATE SCHEMA aud;
@@ -187,7 +188,7 @@ CREATE TABLE cnt.content_item (
   age_min int, age_max int,
   source text NOT NULL, author text NOT NULL, license text NOT NULL,   -- BR-34 缺一不可
   status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','ai_pending','ai_passed','ai_blocked','team_review','tri_party_review','published','rejected','offline')),
-  embedding vector(1024),          -- RAG；维度随所选嵌入模型调整
+  embedding jsonb,                  -- 可选向量；启用 pgvector 时可迁移为 vector(1024)
   created_by uuid, published_at timestamptz, created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX ix_content_feed ON cnt.content_item (status, channel, published_at DESC);

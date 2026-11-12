@@ -1,5 +1,5 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { createHash } from 'node:crypto';
+import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'node:crypto';
 import { Pool, type PoolClient } from 'pg';
 import { config } from '../config';
 
@@ -10,6 +10,16 @@ export interface RuntimeEvent {
   purpose?: string;
   requestId?: string;
   token?: string;
+}
+
+export interface DomainCommand {
+  routeName: string;
+  method: string;
+  token?: string;
+  purpose?: string;
+  params: Record<string, string>;
+  query: Record<string, unknown>;
+  body: unknown;
 }
 
 /**
@@ -26,6 +36,14 @@ export class RuntimePersistence implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     if (!config.databaseUrl) return;
     this.pool = new Pool({ connectionString: config.databaseUrl, connectionTimeoutMillis: 2_000, max: 5 });
+    try {
+      // 生产环境通常由迁移账号预先创建表，应用账号只需验证可访问性。
+      await this.pool.query('SELECT 1 FROM runtime.request_event LIMIT 1');
+      this.ready = true;
+      return;
+    } catch {
+      // 开发环境若使用属主账号，则允许服务自初始化最小运行时表。
+    }
     try {
       await this.pool.query(`
         CREATE SCHEMA IF NOT EXISTS runtime;
@@ -69,8 +87,9 @@ export class RuntimePersistence implements OnModuleInit, OnModuleDestroy {
       client = await this.pool.connect();
       await client.query('BEGIN');
       await client.query("SELECT set_config('app.tenant_id', $1, true)", ['tenant-demo']);
+      await client.query("SELECT pg_advisory_xact_lock(hashtext('runtime.request_event:tenant-demo'))");
       const previous = await client.query<{ hash: string }>(
-        'SELECT hash FROM runtime.request_event WHERE tenant_id = $1 ORDER BY id DESC LIMIT 1 FOR UPDATE',
+        'SELECT hash FROM runtime.request_event WHERE tenant_id = $1 ORDER BY id DESC LIMIT 1',
         ['tenant-demo'],
       );
       const prevHash = previous.rows[0]?.hash ?? null;
@@ -89,6 +108,69 @@ export class RuntimePersistence implements OnModuleInit, OnModuleDestroy {
     } finally {
       client?.release();
     }
+  }
+
+  async recordCommand(command: DomainCommand) {
+    if (!this.ready || !this.pool) return;
+    let client: PoolClient | undefined;
+    try {
+      client = await this.pool.connect();
+      await client.query('BEGIN');
+      await client.query("SELECT set_config('app.tenant_id', $1, true)", ['tenant-demo']);
+      const encrypted = this.encrypt(command);
+      await client.query(
+        `INSERT INTO runtime.domain_command
+          (tenant_id, route_name, method, payload_enc, iv, auth_tag)
+         VALUES ($1,$2,$3,$4,$5,$6)`,
+        ['tenant-demo', command.routeName, command.method, encrypted.ciphertext, encrypted.iv, encrypted.authTag],
+      );
+      await client.query('COMMIT');
+    } catch {
+      await client?.query('ROLLBACK').catch(() => undefined);
+    } finally {
+      client?.release();
+    }
+  }
+
+  async loadCommands(): Promise<DomainCommand[]> {
+    if (!this.ready || !this.pool) return [];
+    let client: PoolClient | undefined;
+    try {
+      client = await this.pool.connect();
+      await client.query('BEGIN');
+      await client.query("SELECT set_config('app.tenant_id', $1, true)", ['tenant-demo']);
+      const rows = await client.query<{ route_name: string; method: string; payload_enc: Buffer; iv: Buffer; auth_tag: Buffer }>(
+        `SELECT route_name, method, payload_enc, iv, auth_tag
+           FROM runtime.domain_command
+          WHERE tenant_id = $1
+          ORDER BY id ASC`,
+        ['tenant-demo'],
+      );
+      await client.query('COMMIT');
+      return rows.rows.map((row) => this.decrypt(row.payload_enc, row.iv, row.auth_tag) as DomainCommand);
+    } catch {
+      await client?.query('ROLLBACK').catch(() => undefined);
+      return [];
+    } finally {
+      client?.release();
+    }
+  }
+
+  private encryptionKey() {
+    return createHash('sha256').update(config.dataEncryptionKey).digest();
+  }
+
+  private encrypt(value: unknown) {
+    const iv = randomBytes(12);
+    const cipher = createCipheriv('aes-256-gcm', this.encryptionKey(), iv);
+    const ciphertext = Buffer.concat([cipher.update(JSON.stringify(value), 'utf8'), cipher.final()]);
+    return { ciphertext, iv, authTag: cipher.getAuthTag() };
+  }
+
+  private decrypt(ciphertext: Buffer, iv: Buffer, authTag: Buffer) {
+    const decipher = createDecipheriv('aes-256-gcm', this.encryptionKey(), iv);
+    decipher.setAuthTag(authTag);
+    return JSON.parse(Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('utf8')) as unknown;
   }
 
   async onModuleDestroy() {
