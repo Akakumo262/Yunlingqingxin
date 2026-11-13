@@ -34,6 +34,14 @@ npm.cmd run security:test -w @yunling/backend
 npm.cmd run dev:api
 ```
 
+若 Chrome 访问 `localhost:5173` 被拒绝，前端改用 IPv4 监听：
+
+```powershell
+npm.cmd run dev -w @yunling/web -- --host 0.0.0.0
+```
+
+然后打开 `http://127.0.0.1:5173/`。
+
 启动后可用 `npm run accept` 运行 43 项后端验收。
 
 ## 环境变量
