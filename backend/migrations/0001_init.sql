@@ -187,6 +187,9 @@ CREATE TABLE cnt.content_item (
   asset_object_key text, cover_object_key text, duration int,
   age_min int, age_max int,
   source text NOT NULL, author text NOT NULL, license text NOT NULL,   -- BR-34 缺一不可
+  discover_kind text NOT NULL DEFAULT 'general', audience_stages text[] NOT NULL DEFAULT ARRAY['all'],
+  source_type text NOT NULL DEFAULT 'internal', source_verified boolean NOT NULL DEFAULT false,
+  external_url text, deadline text, location text,
   status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','ai_pending','ai_passed','ai_blocked','team_review','tri_party_review','published','rejected','offline')),
   embedding jsonb,                  -- 可选向量；启用 pgvector 时可迁移为 vector(1024)
   created_by uuid, published_at timestamptz, created_at timestamptz NOT NULL DEFAULT now()

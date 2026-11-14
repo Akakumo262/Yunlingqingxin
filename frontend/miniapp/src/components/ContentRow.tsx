@@ -1,6 +1,6 @@
 import Taro from '@tarojs/taro';
 import { Image, View } from '@tarojs/components';
-import { CONTENT_CHANNEL_LABEL, ContentCard, ContentChannel } from '@yunling/contracts';
+import { CONTENT_CHANNEL_LABEL, CONTENT_SOURCE_TYPE_LABEL, DISCOVER_KIND_LABEL, ContentCard, ContentChannel } from '@yunling/contracts';
 import { playIcon } from './icons';
 
 /** 每个频道一种封面底色，没有封面图时也好认 */
@@ -21,7 +21,10 @@ export function ContentRow({ c }: { c: ContentCard }) {
       </View>
       <View className="grow">
         <View style={{ fontWeight: 600, lineHeight: 1.4 }}>{c.title}</View>
-        <View className="faint" style={{ marginTop: '4px' }}>{CONTENT_CHANNEL_LABEL[c.channel]}　{KIND[c.type]} {c.minutes} 分钟　{c.source}</View>
+        <View className="faint" style={{ marginTop: '4px' }}>
+          {c.discover_kind && c.discover_kind !== 'general' ? `${DISCOVER_KIND_LABEL[c.discover_kind]}　` : ''}{CONTENT_CHANNEL_LABEL[c.channel]}　{KIND[c.type]} {c.minutes} 分钟
+        </View>
+        <View className="faint" style={{ marginTop: '4px' }}>{c.source}{c.source_type ? `　${CONTENT_SOURCE_TYPE_LABEL[c.source_type]}` : ''}{c.source_verified ? '　✓来源已核验' : ''}{c.deadline ? `　截止：${c.deadline}` : ''}{c.location ? `　${c.location}` : ''}</View>
       </View>
     </View>
   );

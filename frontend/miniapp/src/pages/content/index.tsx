@@ -1,12 +1,20 @@
 import { useState } from 'react';
 import Taro, { useLoad } from '@tarojs/taro';
 import { Image, Video, View } from '@tarojs/components';
-import { CONTENT_CHANNEL_LABEL, ContentDetail, Routes } from '@yunling/contracts';
+import { CONTENT_CHANNEL_LABEL, CONTENT_SOURCE_TYPE_LABEL, ContentDetail, Routes } from '@yunling/contracts';
 import { api, fail } from '@/services/api';
 import { playIcon } from '@/components/icons';
 import { TONE } from '@/components/ContentRow';
 
 const mmss = (s = 0) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+const openOriginal = (url: string, title: string) => {
+  if (process.env.TARO_ENV === 'h5' && typeof window !== 'undefined') {
+    const opened = window.open(url, '_blank', 'noopener,noreferrer');
+    if (!opened) window.location.assign(url);
+    return;
+  }
+  Taro.navigateTo({ url: `/pages/external/index?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}` });
+};
 
 /** P-27 内容详情：正文或视频，底部写明来源、作者、授权 */
 export default function Content() {
@@ -37,9 +45,16 @@ export default function Content() {
 
       <View className="source faint">
         <View>来源：{c.source}</View>
+        {c.source_type && <View>来源类型：{CONTENT_SOURCE_TYPE_LABEL[c.source_type]}</View>}
+        {c.source_verified && <View style={{ color: '#14876b' }}>✓ 来源已通过平台核验</View>}
         <View>授权：{c.license}</View>
         {c.reviewed_by && <View>审核：{c.reviewed_by}</View>}
+        {c.deadline && <View>截止：{c.deadline}</View>}
+        {c.location && <View>地点：{c.location}</View>}
       </View>
+      {c.external_url && (
+        <View className="btn" style={{ marginTop: '20px' }} onClick={() => openOriginal(c.external_url!, c.title)}>查看原文 / 原资源</View>
+      )}
       <View className="btn btn--ghost" style={{ marginTop: '20px' }} onClick={ask}>还有想问的，找助手聊聊</View>
     </View>
   );

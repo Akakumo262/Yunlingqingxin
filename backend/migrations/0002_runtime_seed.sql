@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS runtime.demo_user (
 INSERT INTO runtime.demo_user (id, tenant_id, account, roles, purposes, activated) VALUES
   ('s1','tenant-demo','student01',ARRAY['student'],ARRAY['PUR-01','PUR-02'],true),
   ('s2','tenant-demo','student02',ARRAY['student'],ARRAY['PUR-01','PUR-02'],false),
+  ('s13','tenant-demo','student03',ARRAY['student'],ARRAY['PUR-01','PUR-02'],true),
   ('g1','tenant-demo','parent01',ARRAY['guardian'],ARRAY['PUR-01'],true),
   ('g2','tenant-demo','parent02',ARRAY['guardian'],ARRAY['PUR-01'],false),
   ('t1','tenant-demo','teacher01',ARRAY['head_teacher'],ARRAY['PUR-01','PUR-02'],true),

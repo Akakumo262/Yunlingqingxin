@@ -11,6 +11,7 @@ export default defineAppConfig({
     'pages/privacy/index', // 隐私与授权（P-09）
     'pages/parent/index', // 家长端（P-11）
     'pages/institutions/index', // 能帮到你的机构（P-33）
+    'pages/external/index', // 权威资讯原文/原资源跳转
   ],
   window: {
     backgroundTextStyle: 'dark',

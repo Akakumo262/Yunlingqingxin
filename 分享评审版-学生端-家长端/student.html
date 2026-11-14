@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>学生端 · 云岭青心评审版</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="app-body student-theme">
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="index.html"><span class="brand-mark">云</span><span>云岭青心 <small>评审分享版</small></span></a>
+      <div class="top-actions"><span class="preview-badge">静态演示</span><a href="parent.html" class="switch-link">切换家长端</a></div>
+    </header>
+    <div class="app-layout">
+      <aside class="side-nav">
+        <div class="profile-mini"><div class="avatar avatar-blue">青</div><div><b>青禾</b><span>八年级（3）班</span></div></div>
+        <button class="nav-item active" data-tab="today"><span>☼</span>今天</button>
+        <button class="nav-item" data-tab="discover"><span>✦</span>发现</button>
+        <button class="nav-item" data-tab="circle"><span>◌</span>成长圈</button>
+        <button class="nav-item" data-tab="assistant"><span>✧</span>助手</button>
+        <button class="nav-item" data-tab="passport"><span>◇</span>成长护照</button>
+        <button class="nav-item" data-tab="privacy"><span>▣</span>隐私与授权</button>
+        <div class="side-note">评审提示：点击左侧栏目，逐页查看信息层级和文案。</div>
+      </aside>
+      <main class="content-area">
+        <section class="tab-panel active" data-panel="today">
+          <div class="page-heading"><div><p class="eyebrow">TODAY · 今日</p><h1>青禾，今天心里<br><span>是什么天气？</span></h1></div><span class="date-pill">11 月 12 日 · 周四</span></div>
+          <div class="weather-card">
+            <div class="weather-sky"><div class="sun"></div><div class="ridge ridge-one"></div><div class="ridge ridge-two"></div><p>选一个最像的就行。</p></div>
+            <div class="weather-picks"><button>大晴天</button><button>晴间多云</button><button>阴天</button><button>小雨</button><button>雷阵雨</button></div>
+          </div>
+          <div class="section-head"><div><p class="eyebrow">SMALL STEP</p><h2>今天的小行动</h2></div><span class="quiet-label">不排名 · 不催促</span></div>
+          <div class="action-card"><span class="action-time">3 分钟</span><div><b>课间去操场走一圈</b><p>回来后记一句此刻的感受。</p></div><button class="outline-button">完成</button></div>
+          <div class="section-head"><div><p class="eyebrow">RECOMMENDED</p><h2>给你留的</h2></div><button class="text-button" data-tab-link="discover">去发现 →</button></div>
+          <div class="mini-grid"><article class="mini-card tint-blue"><span>学习力 · 3 分钟</span><b>考前睡不着，可以试试这三步</b></article><article class="mini-card tint-pink"><span>榜样故事 · 4 分钟</span><b>返乡青年说：我为什么回来做电商</b></article></div>
+          <div class="callout callout-help"><span class="callout-icon">♡</span><div><b>我想找人说</b><p>班主任、心理老师，或者 12355，都可以。</p></div><button class="outline-button">了解</button></div>
+        </section>
+
+        <section class="tab-panel" data-panel="discover">
+          <div class="page-heading"><div><p class="eyebrow">DISCOVER · 发现</p><h1>把有用的机会<br><span>放到你面前</span></h1></div><span class="date-pill">初中阶段</span></div>
+          <div class="notice"><b>推荐规则</b><span>按学段、兴趣和主题推荐，不使用心理测评分数。外部资讯保留原来源。</span></div>
+          <div class="filter-row"><button class="filter active">全部</button><button class="filter">AI 资讯</button><button class="filter">竞赛机会</button><button class="filter">志愿活动</button><button class="filter">生涯探索</button></div>
+          <div class="content-list">
+            <article class="resource-card featured"><div class="resource-visual visual-ai"><span>AI 资讯</span><strong>AI 正在怎样改变学习与实践</strong></div><div class="resource-body"><div class="resource-meta"><span class="verified">✓ 来源已核验</span><span>高中—大学</span></div><h3>教育部等五部门发布“人工智能+教育”行动计划</h3><p>平台只展示摘要和来源，点击后查看教育部原文。</p><div class="resource-foot"><span>教育部政府门户网站 · 政府门户</span><button class="solid-button">查看原文</button></div></div></article>
+            <article class="resource-card"><div class="resource-body"><div class="resource-meta"><span class="tag tag-yellow">竞赛机会</span><span>中职/高职—大学</span></div><h3>中国国际大学生创新大赛：从哪里开始准备</h3><p>官方赛事入口，资格和截止时间以原站通知为准。</p><div class="resource-foot"><span>全国大学生创业服务网 · 全国</span><button class="text-button">查看 →</button></div></div></article>
+            <article class="resource-card"><div class="resource-body"><div class="resource-meta"><span class="tag tag-green">志愿活动</span><span>高中—大学</span></div><h3>中国青年志愿服务项目大赛信息</h3><p>关注主办方、活动时间、集合地点和参与要求。</p><div class="resource-foot"><span>中国青年志愿服务项目大赛官网</span><button class="text-button">查看 →</button></div></div></article>
+          </div>
+          <div class="review-strip"><b>请同事评审</b><span>学生是否需要“按地区 / 截止时间 / 适合年级”继续筛选？</span><button class="comment-button" data-focus="student-feedback">写意见</button></div>
+        </section>
+
+        <section class="tab-panel" data-panel="circle"><div class="page-heading"><div><p class="eyebrow">COMMUNITY · 成长圈</p><h1>和同路的人<br><span>交换一点经验</span></h1></div></div><div class="circle-hero"><span class="circle-icon">◌</span><div><b>八年级学习互助圈</b><p>圈内公开 · 禁止私信 · 新发言先审核</p></div><span class="member-count">128 人</span></div><div class="post-card"><div class="post-head"><span class="avatar avatar-green">松</span><span><b>爱吃米线的松鼠</b><small>昨天 18:20</small></span></div><p>数学错题本我是按“为什么错”分类的，不是按章节，复习快很多。</p><div class="post-actions"><span>♡ 12</span><span>评论 4</span><span>举报</span></div></div><div class="callout"><b>评审关注</b><p>这里需要更明确地告诉学生“为什么不能私信”以及如何求助。</p></div></section>
+
+        <section class="tab-panel" data-panel="assistant"><div class="page-heading"><div><p class="eyebrow">AI ASSISTANT · 助手</p><h1>先听你说，<br><span>再一起找办法</span></h1></div><span class="ai-badge">AI 已标识</span></div><div class="chat-card"><div class="chat-bubble ai">你可以问学习、生活、生涯和公开政策信息。我会把参考来源一起告诉你。</div><div class="chat-bubble user">大学生创新大赛适合什么人？</div><div class="chat-bubble ai">我可以先帮你找到官方赛事入口；报名条件和截止时间请以原通知为准。<div class="source-chip">来源：全国大学生创业服务网</div></div></div><div class="composer"><span>输入你想了解的内容……</span><button class="solid-button">发送</button></div><div class="callout callout-warning"><b>评审关注</b><p>AI 是否需要增加“转人工”“回答不确定”的入口？</p></div></section>
+
+        <section class="tab-panel" data-panel="passport"><div class="page-heading"><div><p class="eyebrow">GROWTH PASSPORT · 成长护照</p><h1>看见自己<br><span>走过的路</span></h1></div></div><div class="passport-card"><p class="eyebrow">我的成长护照</p><h2>青禾</h2><p>云岭演示中学 · 八年级（3）班</p><div class="stamp-row"><span>德<br><b>3</b> 次</span><span>智<br><b>5</b> 次</span><span>体<br><b>8</b> 次</span><span>美<br><b>2</b> 次</span><span>劳<br><b>4</b> 次</span></div></div><div class="timeline-card"><div class="timeline-item"><b>参加校园读书会</b><span>智育 · 10 月 28 日</span><p>我发现自己可以把一个问题讲给别人听。</p></div><div class="timeline-item"><b>和同桌完成班级海报</b><span>美育 · 10 月 18 日</span><p>原来分工以后，做事会轻松很多。</p></div></div></section>
+
+        <section class="tab-panel" data-panel="privacy"><div class="page-heading"><div><p class="eyebrow">PRIVACY · 隐私与授权</p><h1>你的记录<br><span>由你决定怎么分享</span></h1></div></div><div class="privacy-card"><div class="privacy-row"><span class="privacy-icon">◉</span><div><b>基础服务</b><p>用于确认身份、看内容、打卡和求助。</p></div><strong class="status-on">已同意</strong></div><div class="privacy-row"><span class="privacy-icon">✦</span><div><b>成长问卷</b><p>可以随时撤回，家长看不到原始分数。</p></div><button class="toggle-on">已打开</button></div><div class="privacy-row"><span class="privacy-icon">♡</span><div><b>向家长开放心情趋势</b><p>不打开时，家长只看到通用陪伴建议。</p></div><button class="toggle-off">未打开</button></div></div><div class="access-card"><h3>最近谁看过我的记录？</h3><p><b>班主任</b> 看过你的心情趋势 <span>2 天前</span></p><p><b>心理老师</b> 看过成长问卷结果 <span>5 天前</span></p></div></section>
+
+        <section class="feedback-panel" id="student-feedback"><div class="feedback-head"><div><p class="eyebrow">FEEDBACK · 意见记录</p><h2>把具体意见留在这里</h2><p>这份意见只保存在当前浏览器里，方便评审时记录。</p></div><span class="feedback-count" data-feedback-count>0 条</span></div><form class="feedback-form"><select name="area"><option>学生端整体</option><option>今天首页</option><option>发现内容</option><option>成长圈</option><option>AI 助手</option><option>成长护照</option><option>隐私授权</option></select><textarea name="message" placeholder="例如：发现页希望增加按城市筛选……" required></textarea><button class="solid-button" type="submit">保存这条意见</button></form><div class="feedback-list" data-feedback-list></div></section>
+      </main>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

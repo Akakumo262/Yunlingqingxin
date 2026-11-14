@@ -6,6 +6,7 @@ import { api, fail, loginAs, session } from '@/services/api';
 
 const WHO = [
   { account: 'student01', title: '我是学生', hint: '已经用学籍信息激活过' },
+  { account: 'student03', title: '我是大学生', hint: '查看竞赛、志愿和 AI 资讯推荐' },
   { account: 'parent01', title: '我是家长', hint: '已经绑定了孩子' },
   { account: 'student02', title: '新同学第一次来', hint: '体验用学校码激活' },
   { account: 'parent02', title: '新家长第一次来', hint: '体验绑定孩子' },

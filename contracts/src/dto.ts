@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import {
-  AlertStatus, AuditResult, CAREER_CARD_TYPES, CASE_STATUSES, CONSENT_PURPOSES, CONTACT_TARGETS, CONTENT_CHANNELS, CONTENT_TYPES,
+  AlertStatus, AuditResult, CAREER_CARD_TYPES, CASE_STATUSES, CONSENT_PURPOSES, CONTACT_TARGETS, CONTENT_CHANNELS, CONTENT_TYPES, STUDENT_STAGES,
   CareerCardType, CaseStatus, CircleType, ConsentPurpose, ContentChannel, ContentStatus, ContentType, FiveEdu, INSTITUTION_TYPES,
   INTERVENTION_TYPES, InstitutionStatus, InstitutionType, InstrumentKind, InterventionType, MODERATE_ACTIONS, MOODS, Mood, NEXT_STEPS,
   NextStep, OBSERVATION_DIMENSIONS, OBSERVATION_SCENES, ObservationDimension, ObservationScene, PostStatus, PurposeCode, REPORT_REASONS,
-  ReferralStatus, ReportReason, Role, SIGNAL_SOURCES, SignalSource, SupportLevel,
+  CONTENT_SOURCE_TYPES, DISCOVER_KINDS, DiscoverKind, ReferralStatus, ReportReason, Role, SIGNAL_SOURCES, SignalSource, StudentStage, SupportLevel,
 } from './enums';
 
 /**
@@ -80,6 +80,8 @@ export interface Me {
   student_id?: string;
   /** 仅学生：成长圈里展示的昵称 */
   nickname?: string;
+  /** 仅学生：用于发现页个性化推荐；缺省时按 all 处理。 */
+  student_stage?: StudentStage;
   /** 仅家长：已绑定的孩子 */
   children?: StudentBrief[];
   /** 仅机构账号 */
@@ -363,6 +365,18 @@ export interface ContentCard {
   /** 阅读/观看分钟数 */
   minutes: number;
   source: string;
+  /** 发现页用途分类；旧内容缺省为 general。 */
+  discover_kind?: DiscoverKind;
+  /** 允许展示该内容的学生阶段。包含 all 或为空时对所有学生可见。 */
+  audience_stages?: StudentStage[];
+  /** 来源类型与审核标识，用于展示“权威来源”而不是泛化宣传。 */
+  source_type?: (typeof CONTENT_SOURCE_TYPES)[number];
+  source_verified?: boolean;
+  /** 原文/原资源地址。为空表示平台自有正文，不显示外跳按钮。 */
+  external_url?: string;
+  /** 竞赛/志愿活动的截止日期与地点。 */
+  deadline?: string;
+  location?: string;
   age_label: string;
   status: ContentStatus;
   published_at?: string;
@@ -381,6 +395,9 @@ export interface ContentDetail extends ContentCard {
 export const ContentCreateReq = z.object({
   channel: z.enum(CONTENT_CHANNELS), type: z.enum(CONTENT_TYPES), title: z.string().min(2).max(60), summary: z.string().max(120).default(''),
   body: z.string().min(1), source: z.string().min(1), author: z.string().min(1), license: z.string().min(1), age_label: z.string().default('初中—高中'),
+  discover_kind: z.enum(DISCOVER_KINDS).optional(), audience_stages: z.array(z.enum(STUDENT_STAGES)).optional(),
+  source_type: z.enum(CONTENT_SOURCE_TYPES).optional(), source_verified: z.boolean().optional(), external_url: z.string().url().optional(),
+  deadline: z.string().optional(), location: z.string().optional(),
 });
 export type ContentCreateReq = z.infer<typeof ContentCreateReq>;
 /** → contentReviewQueue 响应为 Page<ContentReviewItem> */

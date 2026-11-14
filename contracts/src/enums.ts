@@ -89,6 +89,27 @@ export const CONTENT_CHANNEL_LABEL: Record<ContentChannel, string> = {
 export const CONTENT_TYPES = ['article', 'video', 'audio'] as const;
 export type ContentType = (typeof CONTENT_TYPES)[number];
 
+/** 学生发现页的推荐分层。没有阶段信息时按 all 返回，不阻断基础内容。 */
+export const STUDENT_STAGES = ['primary_school', 'middle_school', 'high_school', 'vocational', 'university', 'all'] as const;
+export type StudentStage = (typeof STUDENT_STAGES)[number];
+export const STUDENT_STAGE_LABEL: Record<StudentStage, string> = {
+  primary_school: '小学高年级', middle_school: '初中', high_school: '高中', vocational: '中职/高职', university: '大学', all: '全学段',
+};
+
+/** 发现页的内容意图，区别于内容载体 article/video/audio。 */
+export const DISCOVER_KINDS = ['ai_insight', 'competition', 'volunteer', 'learning', 'career', 'policy', 'general'] as const;
+export type DiscoverKind = (typeof DISCOVER_KINDS)[number];
+export const DISCOVER_KIND_LABEL: Record<DiscoverKind, string> = {
+  ai_insight: 'AI 资讯', competition: '竞赛机会', volunteer: '志愿活动', learning: '学习成长', career: '生涯探索', policy: '政策资讯', general: '精选内容',
+};
+
+/** 外部来源类型。仅标记已通过运营审核的来源，不能把普通转载当作权威来源。 */
+export const CONTENT_SOURCE_TYPES = ['official_account', 'government', 'school', 'platform', 'internal'] as const;
+export type ContentSourceType = (typeof CONTENT_SOURCE_TYPES)[number];
+export const CONTENT_SOURCE_TYPE_LABEL: Record<ContentSourceType, string> = {
+  official_account: '官方账号', government: '政府门户', school: '学校/高校', platform: '官方平台', internal: '平台自有',
+};
+
 export const CIRCLE_TYPES = ['class', 'topic', 'activity'] as const;
 export type CircleType = (typeof CIRCLE_TYPES)[number];
 export const POST_STATUSES = ['pending_review', 'published', 'rejected', 'removed'] as const;

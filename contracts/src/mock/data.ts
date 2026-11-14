@@ -25,12 +25,13 @@ const base = { tenant_id: TENANT_ID, school_name: SCHOOL_NAME };
 const klass = { class_id: CLASS_ID, class_name: CLASS_NAME };
 
 /** 学生名单（班级看板用）。s1 即 student01 */
-export const STUDENT_NAMES = ['青禾', '云舟', '小满', '松果', '星回', '阿朵', '石榴', '晚风', '禾木', '南星', '知夏', '山月'];
+export const STUDENT_NAMES = ['青禾', '云舟', '小满', '松果', '星回', '阿朵', '石榴', '晚风', '禾木', '南星', '知夏', '山月', '星河'];
 export const studentId = (i: number) => `s${i + 1}`;
 
 export const USERS: MockUser[] = [
-  { account: 'student01', id: 's1', student_id: 's1', name: '青禾', nickname: '追云的山雀', roles: [Role.student], purposes: [Purpose.growth, Purpose.crisis], ...base, ...klass },
-  { account: 'student02', id: 's2', student_id: 's2', name: '云舟', nickname: '湖边的风', roles: [Role.student], purposes: [Purpose.growth, Purpose.crisis], ...base, ...klass },
+  { account: 'student01', id: 's1', student_id: 's1', name: '青禾', nickname: '追云的山雀', student_stage: 'middle_school', roles: [Role.student], purposes: [Purpose.growth, Purpose.crisis], ...base, ...klass },
+  { account: 'student02', id: 's2', student_id: 's2', name: '云舟', nickname: '湖边的风', student_stage: 'middle_school', roles: [Role.student], purposes: [Purpose.growth, Purpose.crisis], ...base, ...klass },
+  { account: 'student03', id: 's13', student_id: 's13', name: '星河', nickname: '追光的鲸', student_stage: 'university', roles: [Role.student], purposes: [Purpose.growth, Purpose.crisis], tenant_id: TENANT_ID, school_name: '云岭大学' },
   { account: 'parent01', id: 'g1', name: '青禾妈妈', roles: [Role.guardian], purposes: [Purpose.growth], ...base, children: [{ id: 's1', name: '青禾', class_name: CLASS_NAME }] },
   { account: 'parent02', id: 'g2', name: '新家长', roles: [Role.guardian], purposes: [Purpose.growth], ...base, children: [] },
   { account: 'teacher01', id: 't1', name: '李老师', roles: [Role.headTeacher], purposes: [Purpose.growth, Purpose.crisis], ...base, ...klass },
@@ -148,6 +149,37 @@ export const CONTENTS: ContentDetail[] = [
     id: 'ct13', channel: 'psychology', type: 'audio', title: '午休放松音频', summary: '十分钟引导放松。', minutes: 10, duration: 600,
     source: '网络收集', author: '未知', license: '缺授权书', age_label: '全学段', status: 'ai_blocked',
     body: body('（机审拦截：缺少授权证明）'),
+  },
+  {
+    id: 'ct14', channel: 'learning', type: 'article', discover_kind: 'ai_insight', audience_stages: ['high_school', 'vocational', 'university'],
+    title: '教育部等五部门发布“人工智能+教育”行动计划', summary: '面向全学段学习者的官方 AI 教育政策资讯。', minutes: 4,
+    source: '教育部政府门户网站', source_type: 'government', source_verified: true,
+    external_url: 'https://www.moe.gov.cn/srcsite/A16/s3342/202604/t20260410_1433240.html', age_label: '高中—大学', status: 'published', published_at: pub(1),
+    reviewed_by: '平台运营 · 来源核验', author: '教育部等五部门', license: '政府公开信息',
+    body: body('这是一条来自教育部政府门户网站的外部资讯。平台只展示标题、摘要和来源，不复制原文；点击“查看原文”会打开原发布页面。', '涉及报名、资格和时间的信息，请以原页面最新通知为准。'),
+  },
+  {
+    id: 'ct15', channel: 'career', type: 'article', discover_kind: 'competition', audience_stages: ['vocational', 'university'],
+    title: '中国国际大学生创新大赛：从哪里开始准备', summary: '适合在校大学生和职业教育学生关注的官方赛事入口。', minutes: 3,
+    source: '全国大学生创业服务网（教育部）', source_type: 'government', source_verified: true,
+    external_url: 'https://cy.ncss.cn/', deadline: '以官网当年通知为准', location: '全国', age_label: '中职/高职—大学', status: 'published', published_at: pub(2),
+    reviewed_by: '平台运营 · 来源核验', author: '全国大学生创业服务网', license: '官方公开信息',
+    body: body('中国国际大学生创新大赛面向中职中专、高职高专、职业教育本科、普通本科和研究生等学生开放。', '这里提供官方入口，报名资格、赛道和截止时间请以官网通知为准。'),
+  },
+  {
+    id: 'ct16', channel: 'five_edu', type: 'article', discover_kind: 'volunteer', audience_stages: ['high_school', 'vocational', 'university'],
+    title: '把一次志愿服务变成可持续的成长记录', summary: '从官方志愿服务平台找到适合自己的活动，并保留真实参与证明。', minutes: 3,
+    source: '中国青年志愿服务项目大赛官网', source_type: 'official_account', source_verified: true,
+    external_url: 'https://zhijh.youth.cn/', deadline: '以活动页面为准', location: '按活动地区筛选', age_label: '高中—大学', status: 'published', published_at: pub(3),
+    reviewed_by: '平台运营 · 来源核验', author: '中国青年志愿服务项目大赛官网', license: '官方公开信息',
+    body: body('志愿活动要先确认主办方、服务时间、集合地点和未成年人参与要求。', '平台只做经过来源核验的活动入口，不代替原主办方报名，也不要求你在平台提交无关的个人敏感信息。'),
+  },
+  {
+    id: 'ct17', channel: 'learning', type: 'article', discover_kind: 'ai_insight', audience_stages: ['all'],
+    title: '看懂一条 AI 资讯，先问这三个问题', summary: '来源是谁、证据在哪里、和我有什么关系。', minutes: 3,
+    source: '云岭青心 AI 资讯组', source_type: 'internal', source_verified: true,
+    age_label: '全学段', status: 'published', published_at: pub(4), reviewed_by: '内容组 · 三审会签', author: '云岭青心内容组', license: '自有内容',
+    body: body('面对“AI 又有新突破”的标题，先看发布机构和原始链接，再看它有没有给出论文、实验或公开数据。', '如果一条消息只要求转发、购买或填写个人信息，就先停一下，找老师或家长一起核实。'),
   },
 ];
 
