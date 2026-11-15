@@ -1,6 +1,7 @@
 {
   "version": "0.0.1",
   "configurations": [
+    { "name": "demo", "runtimeExecutable": "npm", "runtimeArgs": ["run", "demo"], "port": 5173 },
     { "name": "web", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev:web"], "port": 5173 },
     { "name": "miniapp-h5", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev:miniapp"], "port": 10086 }
   ]

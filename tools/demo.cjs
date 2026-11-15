@@ -33,11 +33,13 @@ async function waitFor(url, seconds) {
   return false;
 }
 
+// 三个服务的端口是固定的。外面如果设了 PORT 环境变量（有些工具会设），不让它把后端带到别的端口上
+const env = { ...process.env, PORT: '3000' };
 const children = [];
 function start(tag, command, cmdArgs, cwd) {
   const child = command === process.execPath
-    ? spawn(command, cmdArgs, { cwd, stdio: ['ignore', 'pipe', 'pipe'] })
-    : spawn([command, ...cmdArgs].join(' '), { cwd, shell: true, stdio: ['ignore', 'pipe', 'pipe'] });
+    ? spawn(command, cmdArgs, { cwd, env, stdio: ['ignore', 'pipe', 'pipe'] })
+    : spawn([command, ...cmdArgs].join(' '), { cwd, env, shell: true, stdio: ['ignore', 'pipe', 'pipe'] });
   // 打包器的进度条和反复出现的等待提示不往外打，只留有用的行
   const noise = /\x1b\[[0-9]*[AK]|wait until bundle finished|Webpack .*building|modules \d+ active/;
   // 小程序的打包器每次编译都会打一大段体积统计，只留“编译结果”和报错
