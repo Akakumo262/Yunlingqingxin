@@ -4,8 +4,8 @@ if (!url) throw new Error('缺少 MIGRATE_DATABASE_URL');
 const pool = new Pool({ connectionString: url });
 (async () => {
   try {
-    await pool.query('TRUNCATE TABLE app_runtime.events RESTART IDENTITY');
-    console.log('运行期事件已清空');
+    await pool.query('TRUNCATE TABLE app_runtime.events, app_runtime.refresh_tokens RESTART IDENTITY');
+    console.log('运行期事件与刷新令牌已清空');
   } finally {
     await pool.end();
   }
