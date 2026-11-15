@@ -20,6 +20,13 @@ const pool = new Pool({ connectionString: url });
       SELECT 1 FROM pg_policies WHERE schemaname = 'app_runtime' AND tablename = 'events' AND policyname = 'tenant_events'
     `);
     if (!policy.rowCount) throw new Error('缺少租户隔离策略');
+    const refresh = await pool.query(`
+      SELECT c.relrowsecurity, c.relforcerowsecurity
+      FROM pg_class c
+      JOIN pg_namespace n ON n.oid = c.relnamespace
+      WHERE n.nspname = 'app_runtime' AND c.relname = 'refresh_tokens'
+    `);
+    if (!refresh.rows[0]?.relrowsecurity || !refresh.rows[0]?.relforcerowsecurity) throw new Error('refresh_tokens 未启用强制 RLS');
     console.log('安全测试通过：事件表强制 RLS 与租户策略正常');
   } finally {
     await pool.end();
