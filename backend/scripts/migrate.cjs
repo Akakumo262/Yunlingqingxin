@@ -8,7 +8,7 @@ if (!url) {
   process.exit(1);
 }
 
-const files = ['0002_runtime_events.sql', '0003_runtime_event_purpose.sql'];
+const files = ['0002_runtime_events.sql', '0003_runtime_event_purpose.sql', '0004_refresh_tokens.sql'];
 const sql = files.map((file) => fs.readFileSync(path.join(__dirname, '..', 'migrations', file), 'utf8')).join('\n');
 const pool = new Pool({ connectionString: url });
 

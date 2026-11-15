@@ -63,7 +63,7 @@ export class RuntimeService implements OnModuleDestroy {
     const eventAccount = account ?? this.accountForRequest(name, req.body) ?? (route.roles === 'public' && route.method !== 'GET' ? 'ops01' : undefined);
 
     if (AUTH_ROUTES.has(name) && response.status < 300) {
-      const body = this.issueAccessToken(name, req.body, response.body as JsonRecord);
+      const body = await this.issueAccessToken(name, req.body, response.body as JsonRecord);
       if (eventAccount) await this.appendEvent(eventAccount, route, name, purpose as PurposeCode | null, params, req.query ?? {}, req.body, body);
       return { status: response.status, body };
     }
@@ -79,12 +79,23 @@ export class RuntimeService implements OnModuleDestroy {
       if (process.env.NODE_ENV === 'production') throw new Error('DATABASE_URL must be configured in production');
       return;
     }
-    await this.pool.query(`SELECT set_config('app.tenant_id', 'tenant-demo', false)`);
-    const rows = await this.pool.query<{
+    const client = await this.pool.connect();
+    let rows: { rows: Array<{
       account: string; route_name: RouteName; purpose: PurposeCode | null; params: Record<string, string>; query: Record<string, unknown>;
       payload_ciphertext: string; payload_iv: string; payload_tag: string;
       result_ciphertext: string | null; result_iv: string | null; result_tag: string | null;
-    }>(`SELECT account, route_name, purpose, params, query, payload_ciphertext, payload_iv, payload_tag, result_ciphertext, result_iv, result_tag FROM app_runtime.events ORDER BY id`);
+    }> };
+    try {
+      await client.query('BEGIN');
+      await client.query(`SELECT set_config('app.tenant_id', 'tenant-demo', true)`);
+      rows = await client.query(`SELECT account, route_name, purpose, params, query, payload_ciphertext, payload_iv, payload_tag, result_ciphertext, result_iv, result_tag FROM app_runtime.events ORDER BY id`);
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
     const idMap = new Map<string, string>();
     for (const row of rows.rows) {
       const body = this.replaceIds(this.decrypt(row.payload_ciphertext, row.payload_iv, row.payload_tag), idMap);
@@ -151,13 +162,14 @@ export class RuntimeService implements OnModuleDestroy {
     return undefined;
   }
 
-  private issueAccessToken(name: RouteName, body: unknown, response: JsonRecord): JsonRecord {
+  private async issueAccessToken(name: RouteName, body: unknown, response: JsonRecord): Promise<JsonRecord> {
     const b = (body ?? {}) as JsonRecord;
     const account = name === 'authWechatLogin'
       ? String(b.code ?? '').startsWith('guardian') ? 'parent01' : String(b.code ?? '').startsWith('new') ? 'student02' : 'student01'
       : String(b.account ?? '');
     const user = fixtures.USERS.find((x) => x.account === account);
     if (!user) return response;
+    const refreshToken = randomUUID();
     const claims: Claims = {
       sub: user.id,
       account: user.account,
@@ -166,12 +178,33 @@ export class RuntimeService implements OnModuleDestroy {
       purposes: user.purposes,
       jti: randomUUID(),
     };
+    await this.persistRefreshToken(user.tenant_id, user.account, refreshToken);
     return {
       ...response,
       access_token: jwt.sign(claims, config.jwtSecret, { expiresIn: config.accessTtlSec }),
-      refresh_token: randomUUID(),
+      refresh_token: refreshToken,
       expires_in: config.accessTtlSec,
     };
+  }
+
+  private async persistRefreshToken(tenantId: string, account: string, refreshToken: string) {
+    if (!this.pool) return;
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query(`SELECT set_config('app.tenant_id', $1, true)`, [tenantId]);
+      await client.query(
+        `INSERT INTO app_runtime.refresh_tokens (tenant_id, account, token_hash, expires_at)
+         VALUES ($1, $2, $3, now() + ($4 * interval '1 second'))`,
+        [tenantId, account, createHash('sha256').update(refreshToken).digest('hex'), config.refreshTtlSec],
+      );
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   private encrypt(text: string) {
