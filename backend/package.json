@@ -8,6 +8,7 @@
     "start": "node dist/main.js",
     "migrate": "node scripts/migrate.cjs",
     "seed:content": "node scripts/seed-content-sources.cjs",
+    "import:content": "node scripts/import-content.cjs",
     "reset": "node scripts/reset-runtime.cjs",
     "security:test": "node scripts/security-check.cjs"
   },
