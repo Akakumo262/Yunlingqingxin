@@ -27,7 +27,14 @@ const pool = new Pool({ connectionString: url });
       WHERE n.nspname = 'app_runtime' AND c.relname = 'refresh_tokens'
     `);
     if (!refresh.rows[0]?.relrowsecurity || !refresh.rows[0]?.relforcerowsecurity) throw new Error('refresh_tokens 未启用强制 RLS');
-    console.log('安全测试通过：事件表强制 RLS 与租户策略正常');
+    const refreshPolicy = await pool.query(`
+      SELECT 1 FROM pg_policies WHERE schemaname = 'app_runtime' AND tablename = 'refresh_tokens' AND policyname = 'tenant_refresh_tokens'
+    `);
+    if (!refreshPolicy.rowCount) throw new Error('refresh_tokens 缺少租户隔离策略');
+    await pool.query(`SELECT set_config('app.tenant_id', 'tenant-demo', false)`);
+    const badHash = await pool.query(`SELECT 1 FROM app_runtime.refresh_tokens WHERE token_hash !~ '^[0-9a-f]{64}$' LIMIT 1`);
+    if (badHash.rowCount) throw new Error('刷新令牌未以 SHA-256 哈希保存');
+    console.log('安全测试通过：事件表与刷新令牌表强制 RLS、租户策略和哈希存储正常');
   } finally {
     await pool.end();
   }
