@@ -1,3 +1,4 @@
+require('./load-env.cjs');
 const crypto = require('node:crypto');
 const { Pool } = require('pg');
 
