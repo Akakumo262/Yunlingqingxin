@@ -7,7 +7,7 @@
 | `contracts/` | 前后端共用契约：118 个接口、类型、合成内容库、模拟后端、68 项验收 | 3000（模拟后端） | 完成 |
 | `frontend/web/` | 教师端 + 管理端（React + Ant Design），26 个页面 | 5173 | 完成 |
 | `frontend/miniapp/` | 学生端 + 家长端（Taro 微信小程序 + H5），18 个页面 | 10086 | 完成，待真机验证 |
-| `backend/` | 后端（NestJS + PostgreSQL） | 3000 | 起步骨架，待开发 |
+| `backend/` | 后端（NestJS + PostgreSQL） | 3000 | 阶段一已可运行：真实 HTTP、JWT、PostgreSQL 事件/打卡/来源元数据；68 项验收通过，业务仓储仍在推进 |
 
 ## 快速开始
 
@@ -16,6 +16,17 @@ npm install
 npm run mock        # 模拟后端
 npm run dev:web     # 另开终端，打开 http://localhost:5173
 ```
+
+后端真实服务（Windows PowerShell）：先按 [`backend/README.md`](backend/README.md) 配置 PostgreSQL 和环境变量，再执行：
+
+```powershell
+npm.cmd run migrate -w @yunling/backend
+npm.cmd run reset -w @yunling/backend
+npm.cmd run seed:content -w @yunling/backend
+npm.cmd run start -w @yunling/backend
+```
+
+另开终端执行 `npm.cmd run accept`，应看到 68 项全部通过。当前真实后端已经能进行前后端联调，但仍在把契约 mock 适配层逐模块替换为完整业务仓储。
 
 小程序 H5 预览：
 
