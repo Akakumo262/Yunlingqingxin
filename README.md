@@ -11,32 +11,22 @@
 
 ## 快速开始
 
-```bash
-npm install
-npm run mock        # 模拟后端
-npm run dev:web     # 另开终端，打开 http://localhost:5173
-```
-
-后端真实服务（Windows PowerShell）：先按 [`backend/README.md`](backend/README.md) 配置 PostgreSQL 和环境变量，再执行：
-
-```powershell
-npm.cmd run migrate -w @yunling/backend
-npm.cmd run reset -w @yunling/backend
-npm.cmd run seed:content -w @yunling/backend
-npm.cmd run start -w @yunling/backend
-```
-
-另开终端执行 `npm.cmd run accept`，应看到 68 项全部通过。当前真实后端已经能进行前后端联调，但仍在把契约 mock 适配层逐模块替换为完整业务仓储。
-
-小程序 H5 预览：
+需要 Node.js 22 或更高。不需要数据库、Docker 和任何密钥。
 
 ```bash
-cd frontend/miniapp
-npm install
-npm run dev:h5      # 打开 http://localhost:10086，浏览器切到手机尺寸
+npm run setup       # 第一次：装依赖、构建契约包（官方源装不上会自动换国内镜像）
+npm run demo        # 同时启动 模拟后端 + 教师端 + 学生端预览，Ctrl+C 一起停
+npm run check       # 全量自检：类型检查 + 68 项验收
 ```
 
-不启动模拟后端也能运行，前端会自动改用内置的演示数据。
+Windows 上可以直接双击 `启动演示.bat`。启动后打开：
+
+- 教师端 / 管理端：http://localhost:5173 ，登录页下方直接点一个身份
+- 学生端 / 家长端：http://localhost:10086 ，直接点“我是学生”或“我是家长”
+
+只开发其中一端时也可以单独启动（`npm run dev:web`、`npm run dev:miniapp`）；不启动后端时前端会自动改用内置的演示数据。
+
+**每个成员从 [docs/成员上手指南.md](docs/成员上手指南.md) 开始**，里面按分工（演示、Web、小程序、后端、内容、测试、交付材料）各有一节。
 
 ## 演示时可以这样走一遍
 
@@ -49,8 +39,24 @@ npm run dev:h5      # 打开 http://localhost:10086，浏览器切到手机尺�
 5. Web“班主任”给家长发一张沟通单 → 小程序“我是家长”回一句 → 班主任收到通知。
 6. Web“校领导”对一条个案发起紧急访问 → Web“安全审计”复核。
 
+### 换成真实后端
+
+后端真实服务（Windows PowerShell）：先按 [`backend/README.md`](backend/README.md) 配置 PostgreSQL 和环境变量，再执行：
+
+```powershell
+npm.cmd run migrate -w @yunling/backend
+npm.cmd run reset -w @yunling/backend
+npm.cmd run seed:content -w @yunling/backend
+npm.cmd run start -w @yunling/backend
+```
+
+另开终端执行 `npm.cmd run accept`，应看到 68 项全部通过。当前真实后端已经能进行前后端联调，但仍在把契约 mock 适配层逐模块替换为完整业务仓储。
+
+后端起在 3000 端口后，`npm run demo` 会直接使用它，不再启动模拟后端。
+
 ## 文档
 
+- [docs/成员上手指南.md](docs/成员上手指南.md)：所有成员的入口，按分工告诉你读什么、跑什么、改哪里
 - [docs/前后端对齐契约.md](docs/前后端对齐契约.md)：端口、接口约定、演示账号、页面与接口对应、产品红线
 - [docs/后端交接说明.md](docs/后端交接说明.md)：后端开发者从这里开始
 - [AGENTS.md](AGENTS.md)：给 AI 协作者的入口说明

@@ -1,7 +1,7 @@
 # 云岭青心 · 给 AI 协作者的说明
 
 这个仓库由两个人在两台电脑上协作：一人负责前端，一人负责后端。两边靠 `contracts/` 对齐。
-先确认你被分配的是哪一部分，再读对应的文档。
+先确认你被分配的是哪一部分，再读对应的文档。不属于前端或后端的分工（演示、内容、测试、交付材料）见 `docs/成员上手指南.md`。
 
 ## 如果你负责后端
 
@@ -35,7 +35,10 @@
 ## 常用命令（根目录）
 
 ```bash
-npm install                 # 网络不稳可加 --registry=https://registry.npmmirror.com
+npm run setup               # 第一次：装全部依赖并构建契约包（装不上会自动换国内镜像）
+npm run demo                # 同时启动模拟后端、Web、小程序预览
+npm run check               # 全量自检：类型检查 + 68 项验收。提交之前跑一次
+npm run pack                # 把已提交的内容打成 zip，放在 release/
 npm run build:contracts     # 改了 contracts 之后
 npm run mock                # 启动模拟后端（3000）
 npm run accept              # 运行 68 项验收

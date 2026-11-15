@@ -8,3 +8,5 @@ dist/
 .temp/
 # 演示素材不得入库（见《技术路径》19.11.1）
 demo-assets/
+# npm run pack 生成的代码包
+release/

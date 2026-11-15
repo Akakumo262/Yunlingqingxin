@@ -2,13 +2,17 @@
   "name": "yunling-qingxin",
   "private": true,
   "version": "0.1.0",
-  "description": "云岭青心 · 青少年成长学习与资源协同平台（G0 软著版骨架）",
+  "description": "云岭青心 · 青少年成长学习与资源协同平台",
   "workspaces": [
     "contracts",
     "backend",
     "frontend/web"
   ],
   "scripts": {
+    "setup": "node tools/setup.cjs",
+    "demo": "node tools/demo.cjs",
+    "check": "node tools/check.cjs",
+    "pack": "node tools/pack.cjs",
     "build:contracts": "npm run build -w @yunling/contracts",
     "dev:api": "npm run build:contracts && npm run dev -w @yunling/backend",
     "dev:web": "npm run dev -w @yunling/web",
