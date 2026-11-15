@@ -6,7 +6,9 @@
     "dev": "nest start --watch",
     "build": "nest build",
     "start": "node dist/main.js",
-    "migrate": "node-pg-migrate up -m migrations --migration-file-language sql -d MIGRATE_DATABASE_URL"
+    "migrate": "node scripts/migrate.cjs",
+    "reset": "node scripts/reset-runtime.cjs",
+    "security:test": "node scripts/security-check.cjs"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",

@@ -21,7 +21,7 @@ export class ProblemFilter implements ExceptionFilter {
     const reply = http.getResponse();
     const isHttp = err instanceof HttpException;
     const status = isHttp ? err.getStatus() : 500;
-    if (!isHttp) console.error(err);
+    if (!isHttp && process.env.NODE_ENV !== 'test') console.error(err);
     const code: ErrorCode = err instanceof Problem ? err.code : (STATUS_CODE[status] ?? 'INTERNAL');
     const body: ProblemBody = {
       type: `https://errors.yunling.local/${code.toLowerCase().replace(/_/g, '-')}`,
