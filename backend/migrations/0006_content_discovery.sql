@@ -36,6 +36,9 @@ CREATE INDEX IF NOT EXISTS ix_content_discovery_kind
   ON cnt.content_discovery (discover_kind, source_verified, deadline);
 CREATE INDEX IF NOT EXISTS ix_content_discovery_source
   ON cnt.content_discovery (source_id, source_verified);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_content_discovery_hash
+  ON cnt.content_discovery (content_hash)
+  WHERE content_hash IS NOT NULL;
 
 COMMENT ON TABLE cnt.content_source IS '可追溯内容来源；只有人工审核后才允许作为已验证来源';
 COMMENT ON TABLE cnt.content_discovery IS '学生发现流的外部资源与受众元数据，不存抓取正文';
