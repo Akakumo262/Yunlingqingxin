@@ -1,4 +1,15 @@
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { loadEnvFile } from 'node:process';
 import { PORTS } from '@yunling/contracts';
+
+// 让 `npm.cmd run start -w @yunling/backend` 直接读取仓库根目录的 .env.local。
+for (const file of [resolve(process.cwd(), '.env.local'), resolve(process.cwd(), 'backend', '.env.local'), resolve(__dirname, '../../.env.local'), resolve(__dirname, '../.env.local')]) {
+  if (existsSync(file)) {
+    loadEnvFile(file);
+    break;
+  }
+}
 
 const requiredSecret = (name: string, fallback: string) => {
   const value = process.env[name];

@@ -1,3 +1,4 @@
+require('./load-env.cjs');
 const fs = require('node:fs');
 const path = require('node:path');
 const { Pool } = require('pg');

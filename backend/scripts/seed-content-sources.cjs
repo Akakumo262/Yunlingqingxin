@@ -1,3 +1,4 @@
+require('./load-env.cjs');
 const { Pool } = require('pg');
 
 const url = process.env.MIGRATE_DATABASE_URL || process.env.DATABASE_URL;
