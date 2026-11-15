@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Drawer, Form, Input, Modal, Segmented, Select, Spin, Switch, Table } from 'antd';
-import { CASE_TRANSITIONS, CaseDetail, CaseStatus, CaseSummary, Institution, InterventionType, Page, Role, Routes, SupportPlan } from '@yunling/contracts';
+import { AccessGrant, CASE_TRANSITIONS, CaseDetail, CaseStatus, CaseSummary, Institution, InterventionType, Page, Role, Routes, SupportPlan } from '@yunling/contracts';
 import { api } from '@/api/client';
 import { useAct, useGet } from '@/api/hooks';
 import { useAuth } from '@/store/auth';
@@ -128,7 +129,19 @@ function CaseDrawer({ id, onClose }: { id: string | null; onClose: () => void })
 export default function Cases() {
   const [status, setStatus] = useState<CaseStatus | ''>('');
   const [id, setId] = useState<string | null>(null);
-  const canOpen = useAuth((s) => s.me)!.roles.some((r) => (Routes.caseGet.roles as Role[]).includes(r));
+  const nav = useNavigate();
+  const [sp, setSp] = useSearchParams();
+  const roles = useAuth((s) => s.me)!.roles;
+  const canOpen = roles.some((r) => (Routes.caseGet.roles as Role[]).includes(r));
+  const canGlass = roles.includes(Role.schoolLeader);
+  const [glass, setGlass] = useState<CaseSummary | null>(null);
+  const [why, setWhy] = useState('');
+  const [mins, setMins] = useState(60);
+  const breakGlass = useAct(() => api<AccessGrant>(Routes.breakGlass, { params: { id: glass!.id }, body: { reason: why, minutes: mins } }), ['grants'], '已开通，到时间自动收回。审计员会收到通知并在事后复核');
+  useEffect(() => {
+    const open = sp.get('open');
+    if (open && canOpen) (setId(open), setSp({}, { replace: true }));
+  }, [sp, canOpen, setSp]);
   const { data, isLoading } = useGet<Page<CaseSummary>>(['cases', 'list', status], Routes.caseList, { query: { status } });
 
   return (
@@ -146,9 +159,17 @@ export default function Cases() {
             { title: '状态', dataIndex: 'status', render: (v: CaseStatus) => <span className={`pill ${STATUS[v].cls}`}>{STATUS[v].text}</span> },
             { title: '主责', dataIndex: 'owner_name' },
             { title: '最近更新', dataIndex: 'updated_at', render: fmtTime },
+            ...(canGlass ? [{ title: '', render: (_: unknown, r: CaseSummary) => (r.level === 'L2' || r.level === 'L3') && <Button size="small" onClick={() => (setWhy(''), setGlass(r))}>紧急访问</Button> }] : []),
           ]} />
+        {canGlass && <p className="faint" style={{ fontSize: 12, marginTop: 12 }}>校领导平时只看到案件号和状态。确有紧急情况需要了解详情时，可以发起紧急访问：写明理由、限时、事后复核。</p>}
       </Sheet>
       <CaseDrawer id={id} onClose={() => setId(null)} />
+      <Modal open={!!glass} title={`紧急访问 ${glass?.case_no ?? ''}`} okText="确认发起" cancelText="取消" confirmLoading={breakGlass.isPending} okButtonProps={{ disabled: why.trim().length < 20, danger: true }}
+        onCancel={() => setGlass(null)} onOk={() => breakGlass.mutate(undefined, { onSuccess: () => (setGlass(null), nav('/grants')) })}>
+        <p className="muted" style={{ marginBottom: 12 }}>这次访问会被完整记录，并立刻通知审计员。只在确实需要了解详情才能保护学生安全的时候使用。</p>
+        <Input.TextArea rows={3} value={why} maxLength={300} showCount onChange={(e) => setWhy(e.target.value)} placeholder="写明为什么现在必须看（不少于 20 个字）。比如：学生今晚未返校，需要了解已有的支持安排以便联系家长和心理教师。" />
+        <div style={{ marginTop: 14 }}><span className="muted" style={{ marginRight: 12 }}>开通多久</span><Segmented value={mins} onChange={(v) => setMins(v as number)} options={[{ value: 30, label: '30 分钟' }, { value: 60, label: '60 分钟' }, { value: 120, label: '120 分钟' }]} /></div>
+      </Modal>
     </>
   );
 }

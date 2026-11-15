@@ -2,19 +2,26 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ConfigProvider } from 'antd';
+import { App as AntApp, ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import App from './App';
+import { toast } from './api/toast';
 import { tokens } from '../../design/tokens';
 import './styles.css';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 0, refetchOnWindowFocus: false } } });
 const c = tokens.color;
+/** 把带主题的提示实例交给全局 toast */
+function ToastBridge() {
+  toast.api = AntApp.useApp().message;
+  return null;
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ConfigProvider
       locale={zhCN}
+      button={{ autoInsertSpace: false }}
       theme={{
         token: {
           colorPrimary: c.lake600, colorError: c.camellia, colorSuccess: c.pine, colorWarning: '#C98A00', colorInfo: c.lake600,
@@ -30,11 +37,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         },
       }}
     >
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </QueryClientProvider>
+      <AntApp component={false}>
+        <ToastBridge />
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </QueryClientProvider>
+      </AntApp>
     </ConfigProvider>
   </React.StrictMode>,
 );

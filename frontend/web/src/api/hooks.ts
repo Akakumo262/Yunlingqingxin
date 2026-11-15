@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { message } from 'antd';
+import { toast } from './toast';
 import type { RouteDef } from '@yunling/contracts';
 import { api } from './client';
 import { fail } from '@/components/ui';
@@ -18,7 +18,7 @@ export function useAct<V, T = unknown>(fn: (v: V) => Promise<T>, refresh: string
     mutationFn: fn,
     onSuccess: () => {
       refresh.forEach((k) => qc.invalidateQueries({ queryKey: [k] }));
-      if (done) message.success(done);
+      if (done) toast.api.success(done);
     },
     onError: fail,
   });

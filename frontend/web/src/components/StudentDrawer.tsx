@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Button, Drawer, Input, Spin } from 'antd';
-import { NextStep, ObservationCreateReq, ObservationDimension, ObservationScene, Routes, StudentCard } from '@yunling/contracts';
+import { NOTE_KINDS, NOTE_KIND_LABEL, NextStep, NoteKind, ObservationCreateReq, ObservationDimension, ObservationScene, Role, Routes, StudentCard } from '@yunling/contracts';
 import { api } from '@/api/client';
 import { useAct, useGet } from '@/api/hooks';
+import { useAuth } from '@/store/auth';
 import { Level, MoodDots, fmtTime } from './ui';
 
 const SCENES: [ObservationScene, string][] = [['break', '课间'], ['after_class', '课后'], ['home_visit', '家访'], ['other', '其他']];
@@ -20,10 +21,14 @@ export default function StudentDrawer({ id, onClose }: { id: string | null; onCl
 
   const save = useAct(
     (body: ObservationCreateReq) => api(Routes.observationCreate, { body }),
-    ['student', 'alerts', 'class'],
+    ['student', 'alerts', 'class', 'followups'],
     next === 'refer_psychologist' ? '已保存，并通知了心理老师' : '谈话记录已保存',
   );
   const submit = () => save.mutate({ student_id: id!, scene, dimensions: dims, note, next_step: next }, { onSuccess: () => (setNote(''), setDims([])) });
+  const isHead = useAuth((s) => s.me)!.roles.includes(Role.headTeacher);
+  const [kind, setKind] = useState<NoteKind>('praise');
+  const [text, setText] = useState('');
+  const send = useAct(() => api(Routes.noteCreate, { body: { student_id: id!, kind, text } }), ['notes'], '沟通单已发给家长，家长回复后你会收到通知');
   const toggle = (d: ObservationDimension) => setDims((x) => (x.includes(d) ? x.filter((i) => i !== d) : [...x, d]));
 
   return (
@@ -60,6 +65,15 @@ export default function StudentDrawer({ id, onClose }: { id: string | null; onCl
               <Button type="primary" disabled={!dims.length || !note.trim()} loading={save.isPending} onClick={submit}>保存谈话记录</Button>
             </div>
           </section>
+
+          {isHead && (
+            <section>
+              <h3 style={{ fontSize: 14, marginBottom: 10 }}>给家长发一张沟通单</h3>
+              <div className="choice">{NOTE_KINDS.map((k) => <button key={k} aria-pressed={kind === k} onClick={() => setKind(k)}>{NOTE_KIND_LABEL[k]}</button>)}</div>
+              <Input.TextArea style={{ marginTop: 10 }} value={text} onChange={(e) => setText(e.target.value)} rows={2} maxLength={300} placeholder="一对一发给这位同学的家长。只写具体的事，不写评价和等级。" />
+              <Button style={{ marginTop: 10 }} disabled={!text.trim()} loading={send.isPending} onClick={() => send.mutate(undefined, { onSuccess: () => setText('') })}>发给家长</Button>
+            </section>
+          )}
 
           <section>
             <h3 style={{ fontSize: 14 }}>开口的第一句话</h3>

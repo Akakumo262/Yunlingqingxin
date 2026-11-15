@@ -8,7 +8,7 @@ export class ApiError extends Error {
 }
 
 /** 会话只放内存：Token 不写入 Storage，重新打开小程序即重新登录 */
-export const session: { token: string | null; me: Me | null; activated: boolean } = { token: null, me: null, activated: true };
+export const session: { token: string | null; me: Me | null; activated: boolean; bigType: boolean } = { token: null, me: null, activated: true, bigType: false };
 
 const mock = createMock();
 const nameOf = new Map<RouteDef, RouteName>((Object.keys(Routes) as RouteName[]).map((k) => [Routes[k], k]));

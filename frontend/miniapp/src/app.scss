@@ -21,6 +21,8 @@ $sky: #f3f6fb;
 $card: #fff;
 $line: #dfe5f0;
 
+/* H5 下 Taro 给页面容器设了白底，这里用更高优先级的选择器盖掉，否则白色卡片会融进背景 */
+body .taro_router .taro_page { background-color: $sky; }
 page, body, .taro_page {
   background: $sky; color: $ink;
   font-family: 'HarmonyOS Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 30px; line-height: 1.6;
@@ -39,7 +41,7 @@ page, body, .taro_page {
 .card { background: $card; border-radius: 36px; padding: 32px; }
 .card--tint { background: $lake-50; }
 .card--indigo { background: $indigo-900; color: #fff; }
-.chip { display: inline-block; padding: 8px 24px; border-radius: 999px; background: $lake-50; color: $indigo-700; font-size: 24px; margin: 0 12px 12px 0; white-space: nowrap; }
+.chip { display: inline-block; padding: 8px 24px; border-radius: 999px; background: $lake-100; color: $indigo-700; font-size: 24px; margin: 0 12px 12px 0; white-space: nowrap; }
 .chip--on { background: $indigo-900; color: #fff; }
 .chip--rape { background: $rape-100; color: $rape-ink; }
 .btn { background: $lake-600; color: #fff; border-radius: 999px; text-align: center; padding: 26px 0; font-size: 32px; font-weight: 600; }
@@ -180,3 +182,120 @@ page, body, .taro_page {
 
 /* 横向滚动区不显示滚动条 */
 .hscroll ::-webkit-scrollbar, .hscroll::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+/* 仅 H5：在电脑浏览器里收成手机宽度并居中，方便演示和截图。小程序不编译这一段 */
+/*  #ifdef  h5  */
+@media (min-width: 640px) {
+  html { font-size: 22PX !important; background: #dfe5f0; } /* 大写 PX 不参与换算 */
+  body { max-width: 412PX; margin: 0 auto !important; min-height: 100vh; position: relative; }
+  .tabbar, .composer { left: 50%; right: auto; width: 412PX; transform: translateX(-50%); box-sizing: border-box; }
+}
+/*  #endif  */
+
+/* ════════ 第二版补充：更密的信息、更多的页面 ════════ */
+.mt4 { margin-top: 8px; } .mt8 { margin-top: 16px; } .mt12 { margin-top: 24px; } .mt16 { margin-top: 32px; } .mt24 { margin-top: 48px; }
+.bold { font-weight: 600; } .center { text-align: center; } .right { text-align: right; }
+.pre { white-space: pre-wrap; }
+.clamp2 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+
+/* 顶部：标题 + 通知铃铛 */
+.topbar { display: flex; align-items: center; justify-content: space-between; }
+.bell { position: relative; width: 76px; height: 76px; border-radius: 50%; background: rgba(255, 255, 255, 0.28); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.bell--solid { background: $card; }
+.bell image, .bell img { width: 40px; height: 40px; }
+.bell .badge { position: absolute; right: -4px; top: -4px; min-width: 34px; height: 34px; padding: 0 8px; box-sizing: border-box; border-radius: 17px; background: $camellia; color: #fff; font-size: 20px; line-height: 34px; text-align: center; font-weight: 700; }
+.dot { display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: $camellia; margin-left: 10px; vertical-align: middle; }
+.searchbar { display: flex; align-items: center; background: $card; border-radius: 999px; padding: 18px 28px; color: $ink-3; font-size: 28px; }
+.searchbar image, .searchbar img { width: 36px; height: 36px; margin-right: 14px; flex-shrink: 0; }
+.searchbar .grow { flex: 1; font-size: 28px; color: $ink; }
+
+/* 分段切换 */
+.seg { display: flex; background: #e6ecf6; border-radius: 999px; padding: 6px; }
+.seg__item { flex: 1; text-align: center; padding: 14px 0; border-radius: 999px; font-size: 28px; color: $ink-2; }
+.seg__item--on { background: $indigo-900; color: #fff; font-weight: 600; }
+
+/* 封面图 */
+.cover { display: block; width: 100%; height: 340px; border-radius: 32px; overflow: hidden; background: $lake-100; }
+.cover--sm { width: 176px; height: 132px; border-radius: 24px; flex-shrink: 0; margin-right: 24px; }
+.cover--tile { height: 190px; border-radius: 0; }
+.cover--hero { height: 420px; border-radius: 0; }
+.cover-wrap { position: relative; }
+.cover-wrap .poster__play { left: 28px; bottom: 28px; }
+.cover-wrap .poster__len { right: 24px; bottom: 28px; }
+.cover-wrap .poster__tag { left: 24px; top: 24px; }
+.mini-play { position: absolute; left: 12px; bottom: 12px; width: 48px; height: 48px; border-radius: 50%; background: rgba(255, 255, 255, 0.95); display: flex; align-items: center; justify-content: center; }
+.mini-play image, .mini-play img { width: 24px; height: 24px; margin-left: 4px; }
+
+/* 两列瓦片 */
+.tiles { display: flex; flex-wrap: wrap; justify-content: space-between; }
+.tile { width: calc(50% - 12px); background: $card; border-radius: 28px; overflow: hidden; margin-bottom: 24px; }
+.tile__body { padding: 20px 22px 24px; }
+.tile__title { font-size: 30px; font-weight: 700; line-height: 1.35; }
+.tile__sub { font-size: 24px; color: $ink-2; margin-top: 6px; }
+
+/* 专题横滑卡片 */
+.col-card { display: inline-block; vertical-align: top; width: 420px; margin-right: 20px; border-radius: 32px; overflow: hidden; background: $card; white-space: normal; }
+.col-card__body { padding: 20px 24px 26px; }
+
+/* 活动卡片 */
+.act { display: flex; background: $card; border-radius: 32px; padding: 24px; margin-bottom: 20px; }
+.datebox { width: 108px; flex-shrink: 0; margin-right: 24px; border-radius: 24px; background: $lake-50; text-align: center; padding: 14px 0 12px; color: $indigo-900; align-self: flex-start; }
+.datebox .d { font-size: 44px; font-weight: 700; line-height: 1.1; font-family: 'DIN Alternate', 'Bahnschrift', sans-serif; }
+.datebox .m { font-size: 22px; color: $ink-2; }
+.datebox--ended { background: #eef1f7; color: $ink-3; }
+.bar { height: 10px; border-radius: 5px; background: $line; overflow: hidden; margin-top: 12px; }
+.bar__fill { height: 100%; border-radius: 5px; background: $pine; }
+.bar__fill--full { background: $rape; }
+.tag { display: inline-block; font-size: 22px; padding: 2px 16px; border-radius: 999px; background: $lake-50; color: $indigo-700; margin-right: 10px; white-space: nowrap; }
+.tag--ok { background: $pine-100; color: #0b5c48; } .tag--wait { background: $rape-100; color: $rape-ink; } .tag--hot { background: $camellia-100; color: #a01747; } .tag--off { background: #eef1f7; color: $ink-2; }
+.edu { display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; font-size: 26px; font-weight: 700; color: #fff; margin-right: 14px; flex-shrink: 0; }
+.edu--moral { background: $camellia; } .edu--intellectual { background: $lake-600; } .edu--physical { background: #c98a00; } .edu--aesthetic { background: #6b4fd8; } .edu--labor { background: $pine; }
+
+/* 步骤（活动流程、求助进度、计划） */
+.flow { margin-left: 14px; }
+.flow__step { position: relative; padding: 0 0 32px 44px; border-left: 4px solid $line; }
+.flow__step:last-child { border-left-color: transparent; padding-bottom: 0; }
+.flow__step::before { content: ''; position: absolute; left: -16px; top: 6px; width: 24px; height: 24px; border-radius: 50%; background: $card; border: 4px solid $line; box-sizing: content-box; }
+.flow__step--done::before { background: $pine; border-color: $pine; }
+.flow__step--now::before { border-color: $lake-600; }
+.flow__step--done { border-left-color: $pine; }
+
+/* 正文排版 */
+.prose .h { font-size: 36px; font-weight: 700; margin: 48px 0 20px; line-height: 1.35; }
+.prose .li { position: relative; padding-left: 36px; margin-bottom: 20px; }
+.prose .li::before { content: ''; position: absolute; left: 6px; top: 24px; width: 12px; height: 12px; border-radius: 50%; background: $lake-600; }
+.prose .q { border-left: 10px solid $rape; background: $rape-100; color: $rape-ink; border-radius: 0 24px 24px 0; padding: 24px 28px; margin: 36px 0; font-weight: 600; }
+.takeaways { background: $indigo-900; color: #fff; border-radius: 36px; padding: 32px; margin-top: 40px; }
+.takeaways .t { color: $rape; font-size: 26px; margin-bottom: 12px; }
+.takeaways .i { display: flex; margin-top: 14px; }
+.takeaways .n { width: 44px; color: $rape; font-weight: 700; font-family: 'DIN Alternate', 'Bahnschrift', sans-serif; flex-shrink: 0; }
+.actions { display: flex; margin-top: 36px; }
+.actions .act-btn { flex: 1; text-align: center; padding: 22px 0; border-radius: 999px; background: $card; margin-right: 16px; font-size: 28px; color: $ink; }
+.actions .act-btn:last-child { margin-right: 0; }
+.actions .act-btn--on { background: $indigo-900; color: #fff; }
+
+/* 计划进度点 */
+.days { display: flex; flex-wrap: wrap; }
+.day { width: 56px; height: 56px; border-radius: 50%; border: 3px solid $line; margin: 0 12px 12px 0; display: flex; align-items: center; justify-content: center; font-size: 24px; color: $ink-3; box-sizing: border-box; }
+.day--done { background: $pine; border-color: $pine; color: #fff; }
+.day--now { border-color: $lake-600; color: $lake-600; font-weight: 700; }
+
+/* 表单 */
+.label { font-size: 26px; color: $ink-2; margin: 24px 0 10px; }
+.area { background: $sky; border-radius: 24px; padding: 24px 28px; font-size: 30px; width: 100%; box-sizing: border-box; min-height: 180px; }
+.card .area, .card .field { background: $sky; }
+.code { letter-spacing: 16px; font-size: 48px; font-weight: 700; text-align: center; font-family: 'DIN Alternate', 'Bahnschrift', sans-serif; }
+.empty { text-align: center; padding: 72px 0; color: $ink-2; }
+.empty image, .empty img { width: 280px; height: 168px; border-radius: 28px; display: block; margin: 0 auto 28px; }
+
+/* 盖章的一瞬间：成长护照新增印记时的提示 */
+@keyframes stamp-in { 0% { transform: scale(2.4) rotate(-18deg); opacity: 0; } 60% { transform: scale(0.92) rotate(-8deg); opacity: 1; } 100% { transform: scale(1) rotate(-8deg); opacity: 1; } }
+.stamp-toast { position: fixed; left: 0; right: 0; top: 30%; z-index: 50; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+.stamp-toast .stamp { width: 220px; height: 220px; border-width: 8px; background: rgba(255, 255, 255, 0.97); color: $camellia; animation: stamp-in 0.5s ease-out both; }
+.stamp-toast .stamp .edu { font-size: 84px; width: auto; height: auto; background: none; color: inherit; margin: 0; }
+.stamp-toast .stamp .n { font-size: 24px; }
+.stamp-toast .say { margin-top: 24px; background: $indigo-900; color: #fff; padding: 12px 32px; border-radius: 999px; font-size: 26px; }
+
+/* 大字号：在“我的”里打开 */
+.big-type { font-size: 36px; }
+.big-type .muted { font-size: 30px; } .big-type .faint { font-size: 28px; } .big-type .prose { font-size: 38px; } .big-type .h2 { font-size: 40px; } .big-type .tile__title { font-size: 34px; }

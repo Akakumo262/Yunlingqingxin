@@ -1,4 +1,4 @@
-import { HeaderNames, Problem, RouteDef, RouteName, Routes, buildPath, createMock } from '@yunling/contracts';
+import { HeaderNames, Problem, RouteDef, RouteName, Routes, buildPath } from '@yunling/contracts';
 import { useAuth } from '@/store/auth';
 
 export class ApiError extends Error {
@@ -20,7 +20,9 @@ interface CallOpts {
  *   mock        — 只用内置演示数据
  */
 const MODE = (import.meta.env.VITE_API_MODE as 'auto' | 'http' | 'mock' | undefined) ?? 'auto';
-const mock = createMock();
+/** 模拟后端按需加载：连上真实后端时，这部分代码和演示数据都不会下载 */
+let mock: Promise<import('@yunling/contracts/mock').Mock> | null = null;
+const getMock = () => (mock ??= import('@yunling/contracts/mock').then((m) => m.createMock()));
 const nameOf = new Map<RouteDef, RouteName>((Object.keys(Routes) as RouteName[]).map((k) => [Routes[k], k]));
 
 let resolved: Promise<'http' | 'mock'> | null = null;
@@ -40,7 +42,7 @@ export async function api<T>(route: RouteDef, opts: CallOpts = {}): Promise<T> {
 
   if ((await apiMode()) === 'mock') {
     await new Promise((r) => setTimeout(r, 120)); // 留一点加载感，避免界面“瞬移”
-    ({ status, body: data } = mock.call(nameOf.get(route)!, { token, purpose: route.purpose, params: opts.params, query, body: opts.body }));
+    ({ status, body: data } = (await getMock()).call(nameOf.get(route)!, { token, purpose: route.purpose, params: opts.params, query, body: opts.body }));
   } else {
     const qs = new URLSearchParams(query as Record<string, string>).toString();
     const headers: Record<string, string> = {};
