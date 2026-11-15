@@ -10,8 +10,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
-    "sourceMap": true,
-    "incremental": true
+    "sourceMap": true
   },
   "include": ["src"]
 }
