@@ -22,6 +22,18 @@ npm.cmd run start -w @yunling/backend
 
 API 地址为 `http://localhost:3000/api/v1`。
 
+## 内容发现来源
+
+内容发现的外部链接和受众标签存放在 `cnt.content_discovery`，来源白名单存放在
+`cnt.content_source`。迁移后可先导入官方来源：
+
+```powershell
+npm.cmd run seed:content -w @yunling/backend
+```
+
+当前只建立来源审核与元数据边界，不会自动抓取网页；只有人工核验后将
+`source_verified` 设为 `true` 的记录才会向内容接口附加外链。
+
 ## 验收
 
 另开一个终端，在后端已经启动后执行：
