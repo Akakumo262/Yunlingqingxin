@@ -1,3 +1,5 @@
-* text=auto
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+# Windows 批处理必须是 CRLF，否则双击运行时标签跳转会出错
 *.bat text eol=crlf
-*.sh text eol=lf

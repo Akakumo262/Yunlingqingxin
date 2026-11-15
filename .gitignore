@@ -10,3 +10,5 @@ dist/
 demo-assets/
 # npm run pack 生成的代码包
 release/
+# 类型检查的增量缓存，每台电脑各自生成
+*.tsbuildinfo
