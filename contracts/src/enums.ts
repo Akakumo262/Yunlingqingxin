@@ -138,3 +138,50 @@ export const INSTITUTION_TYPE_LABEL: Record<InstitutionType, string> = {
 };
 export const INSTITUTION_STATUSES = ['applied', 'approved', 'rejected', 'offline'] as const;
 export type InstitutionStatus = (typeof INSTITUTION_STATUSES)[number];
+
+export const FIVE_EDU_NAME: Record<FiveEdu, string> = { moral: '德育', intellectual: '智育', physical: '体育', aesthetic: '美育', labor: '劳育' };
+
+/** 站内通知的类别。每一类对应一条跨角色的联动（见 mock/state.ts 的 notify） */
+export const NOTICE_KINDS = ['help', 'alert', 'case', 'referral', 'activity', 'content', 'circle', 'note', 'appointment', 'system'] as const;
+export type NoticeKind = (typeof NOTICE_KINDS)[number];
+
+export const ACTIVITY_STATUSES = ['open', 'full', 'ongoing', 'ended'] as const;
+export type ActivityStatus = (typeof ACTIVITY_STATUSES)[number];
+/** 学生在一场活动里走到哪一步：报名 → 签到 → 写下反思（进成长护照） */
+export const MY_ACTIVITY_STATUSES = ['none', 'signed', 'checked_in', 'reflected'] as const;
+export type MyActivityStatus = (typeof MY_ACTIVITY_STATUSES)[number];
+export const ORGANIZER_TYPES = ['school', 'committee', 'community', 'institution'] as const;
+export type OrganizerType = (typeof ORGANIZER_TYPES)[number];
+export const ORGANIZER_TYPE_LABEL: Record<OrganizerType, string> = { school: '学校', committee: '团委', community: '社区', institution: '入驻机构' };
+
+export const APPOINTMENT_TOPICS = ['study', 'mood', 'peer', 'family', 'other'] as const;
+export type AppointmentTopic = (typeof APPOINTMENT_TOPICS)[number];
+export const APPOINTMENT_TOPIC_LABEL: Record<AppointmentTopic, string> = { study: '学习上的事', mood: '心情', peer: '和同学的事', family: '家里的事', other: '说不清，想聊聊' };
+export const APPOINTMENT_STATUSES = ['pending', 'confirmed', 'done', 'cancelled'] as const;
+export type AppointmentStatus = (typeof APPOINTMENT_STATUSES)[number];
+
+/** 家校沟通单：结构化的一来一回，不是聊天 */
+export const NOTE_KINDS = ['praise', 'remind', 'invite', 'care'] as const;
+export type NoteKind = (typeof NOTE_KINDS)[number];
+export const NOTE_KIND_LABEL: Record<NoteKind, string> = { praise: '想夸夸孩子', remind: '请家里留意', invite: '邀请参加', care: '想了解情况' };
+
+export const EXPORT_SCOPES = ['class_report', 'case_summary', 'region_report'] as const;
+export type ExportScope = (typeof EXPORT_SCOPES)[number];
+export const EXPORT_SCOPE_LABEL: Record<ExportScope, string> = { class_report: '班级周报', case_summary: '个案摘要', region_report: '区域报告' };
+export const EXPORT_STATUSES = ['pending', 'approved', 'rejected', 'expired'] as const;
+export type ExportStatus = (typeof EXPORT_STATUSES)[number];
+
+export const AUDIENCES = ['all', 'students', 'guardians', 'teachers'] as const;
+export type Audience = (typeof AUDIENCES)[number];
+export const AUDIENCE_LABEL: Record<Audience, string> = { all: '所有人', students: '学生', guardians: '家长', teachers: '教师' };
+
+export const FEEDBACK_KINDS = ['bug', 'idea', 'content', 'other'] as const;
+export type FeedbackKind = (typeof FEEDBACK_KINDS)[number];
+export const FEEDBACK_KIND_LABEL: Record<FeedbackKind, string> = { bug: '有地方不好用', idea: '有个想法', content: '内容有问题', other: '其他' };
+
+export const ROLE_LABEL: Record<Role, string> = {
+  student: '学生', guardian: '家长', head_teacher: '班主任', psychologist: '心理教师', school_leader: '校领导', school_admin: '学校信息员',
+  edu_admin: '教体局', committee: '团委', community: '社区', institution: '协作机构', operator: '平台运营', auditor: '安全审计', moderator: '版主',
+};
+export const PURPOSE_LABEL: Record<PurposeCode, string> = { 'PUR-01': '成长支持', 'PUR-02': '危机处置', 'PUR-03': '区域统计', 'PUR-04': '科研', 'PUR-05': '安全审计' };
+export const CASE_STATUS_LABEL: Record<CaseStatus, string> = { pending_confirm: '待确认', following: '跟进中', referred: '已转介', closed: '已结案', dismissed: '已关闭' };

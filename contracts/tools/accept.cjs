@@ -376,6 +376,238 @@ const group = (title) => console.log(`\n${title}`);
     expectErr(await auditor('caseList'), 403, 'FORBIDDEN', '审计员看个案');
   });
 
+  // ══════════ 第二批接口：日常使用与联动 ══════════
+  const cmt = as('cmt01'), sadmin = as('schooladmin01');
+  const unread = async (who) => (await who('noticeList')).body.unread;
+  const stamps = async () => (await student('passportGet')).body.stamps.reduce((a, s) => a + s.count, 0);
+
+  group('十一、搜索、收藏、专题、学习计划');
+  await t('搜索：空关键词给热门词；有关键词时内容、生涯卡、活动一起搜；学生搜不到家长和教师内容', async () => {
+    ok((await student('searchAll')).body.hot.length >= 5, '空搜索应返回热门搜索词');
+    const r = await student('searchAll', { query: { q: '睡不着' } });
+    expectOk(r, '搜索');
+    ok(r.body.contents.length >= 2 && /睡|失眠/.test(r.body.contents[0].title + (r.body.contents[0].tags || []).join('')), '搜“睡不着”应先出现睡眠相关内容');
+    ok(r.body.contents.every((c) => !['parent', 'teacher'].includes(c.channel)), '学生的搜索结果不应包含家长课堂和教师微课');
+    ok((await student('searchAll', { query: { q: '护士' } })).body.careers.some((c) => c.title.includes('护士')), '搜“护士”应搜到生涯卡');
+  });
+  await t('收藏与看完：状态跟着人走，详情里带相关内容', async () => {
+    ok((await student('contentFavorite', { params: { id: 'psy01' }, body: { on: true } })).body.favorited === true, '收藏');
+    ok((await student('favoriteList')).body.some((c) => c.id === 'psy01'), '收藏列表应包含它');
+    expectOk(await student('contentComplete', { params: { id: 'psy01' } }), '标记看完');
+    const d = (await student('contentGet', { params: { id: 'psy01' } })).body;
+    ok(d.favorited === true && d.completed === true && d.related.length >= 1 && d.takeaways.length >= 1, '详情应带 favorited / completed / related / takeaways');
+    ok((await student2('contentGet', { params: { id: 'psy01' } })).body.favorited === false, '别人的收藏状态不应串');
+    await student('contentFavorite', { params: { id: 'psy01' }, body: { on: false } });
+    ok(!(await student('favoriteList')).body.some((c) => c.id === 'psy01'), '取消收藏后应从列表消失');
+  });
+  await t('专题把相关内容串起来', async () => {
+    const list = (await student('collectionList')).body;
+    ok(list.length >= 8 && list.every((c) => c.count >= 2), '专题列表');
+    const one = (await student('collectionGet', { params: { id: list[0].id } })).body;
+    ok(one.items.length >= 2 && one.items.every((c) => c.status === 'published'), '专题详情应带已发布的内容');
+  });
+  await t('学习计划：加入、完成一天、退出；不记连续天数；没加入不能打卡', async () => {
+    ok((await student('planList')).body.length >= 4, '学习计划列表');
+    ok((await student('planJoin', { params: { id: 'pl2' } })).body.joined === true, '加入计划');
+    const p = (await student('planStepDone', { params: { id: 'pl2', day: '1' } })).body;
+    ok(p.done_days.includes(1) && !/streak|连续/.test(JSON.stringify(p)), '完成第一天，且不返回连续天数');
+    ok((await student('contentGet', { params: { id: 'lrn01' } })).body.completed === true, '计划里关联的内容应同时标记为看完');
+    ok((await student('homeGet')).body.plan, '首页应显示正在进行的计划');
+    expectErr(await student('planStepDone', { params: { id: 'pl3', day: '1' } }), 409, 'CONFLICT', '未加入的计划打卡');
+    ok((await student('planQuit', { params: { id: 'pl2' } })).body.joined === false, '退出计划');
+  });
+  await t('今日小行动：做完盖一枚印记，重复点不重复盖', async () => {
+    const before = await stamps();
+    const action = (await student('homeGet')).body.micro_action;
+    ok((await student('microActionDone', { params: { id: action.id } })).body.done === true, '完成小行动');
+    await student('microActionDone', { params: { id: action.id } });
+    ok((await stamps()) === before + 1, '成长护照应正好多一枚印记');
+    ok((await student('homeGet')).body.micro_action.done === true, '首页应显示已完成');
+  });
+
+  group('十二、五育活动：报名 → 签到 → 反思 → 见证 → 进成长护照');
+  await t('活动列表带状态；学生能看到自己走到哪一步，看不到签到码', async () => {
+    const list = (await student('activityList')).body;
+    ok(list.length >= 10 && list.every((a) => a.status && a.my_status), '活动列表');
+    ok((await student('activityList', { query: { edu: 'labor' } })).body.every((a) => a.edu === 'labor'), '按五育筛选');
+    ok((await student('activityGet', { params: { id: 'a01' } })).body.check_in_code === undefined, '学生不应看到签到码');
+  });
+  await t('报名：名额加一、收到通知；满员和重复报名的处理', async () => {
+    const n = await unread(student);
+    const before = (await student('activityGet', { params: { id: 'a01' } })).body.signed_count;
+    const a = (await student('activitySignup', { params: { id: 'a01' } })).body;
+    ok(a.my_status === 'signed' && a.signed_count === before + 1, '报名后状态与人数');
+    ok((await student('activitySignup', { params: { id: 'a01' } })).body.signed_count === before + 1, '重复报名不应重复计数');
+    ok((await unread(student)) === n + 1, '报名成功应收到一条通知');
+    expectErr(await student2('activitySignup', { params: { id: 'a04' } }), 409, 'CONFLICT', '报名已满的活动');
+  });
+  await t('签到码由老师掌握；码不对不能签到', async () => {
+    shared.code = (await teacher('activityGet', { params: { id: 'a01' } })).body.check_in_code;
+    ok(shared.code, '组织活动的老师应能看到签到码');
+    expectErr(await student('activityCheckIn', { params: { id: 'a01' }, body: { code: '0000' } }), 422, 'VALIDATION_FAILED', '错误的签到码');
+    expectErr(await student('activityReflect', { params: { id: 'a01' }, body: { text: '还没签到' } }), 409, 'CONFLICT', '未签到就写反思');
+    ok((await student('activityCheckIn', { params: { id: 'a01' }, body: { code: shared.code } })).body.my_status === 'checked_in', '签到');
+    expectErr(await student('activityCancel', { params: { id: 'a01' } }), 409, 'CONFLICT', '签到后取消报名');
+  });
+  await t('写反思 → 成长护照多一条记录和一枚印记', async () => {
+    const before = await stamps();
+    ok((await student('activityReflect', { params: { id: 'a01' }, body: { text: '验收：翻地比想象的累，但种下去的时候很踏实。' } })).body.my_status === 'reflected', '写反思');
+    const p = (await student('passportGet')).body;
+    ok(p.records.some((r) => r.title === '校园菜地开垦日' && r.source === 'activity' && r.reflection.includes('验收')), '成长护照应出现这条活动记录');
+    ok((await stamps()) === before + 1, '应多一枚印记');
+  });
+  await t('老师看名单并做见证 → 记录里写上见证人，学生收到通知；别人组织的活动不能看名单', async () => {
+    const roster = (await teacher('activityRoster', { params: { id: 'a01' } })).body;
+    ok(roster.items.some((i) => i.student.id === 's1' && i.status === 'reflected' && i.reflection), '名单应包含刚才的同学及其反思');
+    const n = await unread(student);
+    expectOk(await teacher('activityWitness', { params: { id: 'a01' }, body: { student_id: 's1' } }), '见证');
+    ok((await student('passportGet')).body.records.find((r) => r.title === '校园菜地开垦日').witness, '成长护照的记录应写上见证人');
+    ok((await unread(student)) === n + 1, '学生应收到见证通知');
+    expectErr(await cmt('activityRoster', { params: { id: 'a01' } }), 403, 'FORBIDDEN', '团委查看学校活动的名单');
+    expectOk(await cmt('activityRoster', { params: { id: 'a03' } }), '团委查看自己组织的活动名单');
+  });
+  await t('老师发布活动 → 学生在列表里看到', async () => {
+    const a = await teacher('activityCreate', { body: { edu: 'physical', title: '验收：课后跳绳', intro: '验收脚本创建', place: '操场', start_at: new Date(Date.now() + 3 * 86400000).toISOString(), end_at: new Date(Date.now() + 3 * 86400000 + 3600000).toISOString(), capacity: 20 } });
+    expectOk(a, '发布活动');
+    ok((await student('activityList')).body.some((x) => x.id === a.body.id && x.status === 'open'), '学生应能看到新活动');
+  });
+
+  group('十三、通知与求助进度');
+  await t('通知：未读数、读一条、全部已读', async () => {
+    const l = (await student('noticeList')).body;
+    ok(l.items.length >= 3 && l.unread >= 1 && l.items.every((n) => n.kind && n.title && n.created_at), '通知列表');
+    const first = l.items.find((n) => !n.read);
+    await student('noticeRead', { params: { id: first.id } });
+    ok((await unread(student)) === l.unread - 1, '读一条后未读数减一');
+    await student('noticeReadAll');
+    ok((await unread(student)) === 0, '全部已读后未读数为 0');
+  });
+  await t('求助进度：老师接手后学生立刻知道；全程不出现等级', async () => {
+    const s = await student2('signalCreate', { body: { source: 'one_click_help', contact_preference: ['psychologist'] } });
+    let mine = (await student2('helpRequests')).body.find((h) => h.id === s.body.alert_id);
+    ok(mine && mine.target === 'psychologist' && mine.steps[0].done && !mine.steps[1].done, '刚求助时：已通知、老师尚未看到');
+    const n = await unread(student2);
+    await psy('alertAck', { params: { id: s.body.alert_id } });
+    mine = (await student2('helpRequests')).body.find((h) => h.id === s.body.alert_id);
+    ok(mine.steps[1].done && /周老师/.test(mine.status_text), '老师接手后进度应更新，并说明是谁');
+    ok((await unread(student2)) === n + 1, '学生应收到“老师已经看到”的通知');
+    cleanForStudent((await student2('helpRequests')).body, '求助进度');
+    cleanForStudent((await student2('noticeList')).body, '学生的通知');
+  });
+
+  group('十四、预约、家校沟通单、内容推送、回访');
+  await t('预约心理老师：选时间 → 老师确认 → 学生收到通知；同一时间不能约两次', async () => {
+    const slot = (await student('appointmentSlots')).body.find((x) => x.available);
+    ok(slot && slot.date && slot.time && slot.place, '可预约时间');
+    const a = await student('appointmentCreate', { body: { slot_id: slot.id, topic: 'study', note: '验收' } });
+    expectOk(a, '预约');
+    ok(a.body.status === 'pending' && a.body.student === undefined, '预约应为待确认，学生视图不带 student');
+    expectErr(await student2('appointmentCreate', { body: { slot_id: slot.id } }), 409, 'CONFLICT', '约同一个时间');
+    ok((await psy('appointmentList')).body.some((x) => x.id === a.body.id && x.student.id === 's1'), '心理教师应看到这条预约及学生');
+    const n = await unread(student);
+    ok((await psy('appointmentConfirm', { params: { id: a.body.id } })).body.status === 'confirmed', '确认预约');
+    ok((await unread(student)) === n + 1, '学生应收到确认通知');
+    expectErr(await teacher('appointmentList'), 403, 'FORBIDDEN', '班主任查看预约');
+  });
+  await t('家校沟通单：老师发 → 家长收到并回复 → 老师收到回复', async () => {
+    const note = await teacher('noteCreate', { body: { student_id: 's1', kind: 'praise', text: '验收：今天主动帮同学讲题。' } });
+    expectOk(note, '发沟通单');
+    const got = (await parent('noteList')).body;
+    ok(got.some((x) => x.id === note.body.id) && got.every((x) => x.student.id === 's1'), '家长应只看到自己孩子的沟通单');
+    const n = await unread(teacher);
+    ok((await parent('noteReply', { params: { id: note.body.id }, body: { text: '验收：谢谢老师。' } })).body.reply.text, '家长回复');
+    ok((await unread(teacher)) === n + 1, '老师应收到回复通知');
+    ok((await teacher('noteList')).body.find((x) => x.id === note.body.id).reply, '老师的列表里应看到回复');
+    expectErr(await parent('noteCreate', { body: { student_id: 's1', kind: 'care', text: 'x' } }), 403, 'FORBIDDEN', '家长主动发沟通单');
+  });
+  await t('老师把内容推给全班 → 学生首页“老师推荐”里出现', async () => {
+    const p = await teacher('classPush', { params: { id: fixtures.CLASS_ID }, body: { content_id: 'psy04', message: '验收：课前可以跟着做一次。' } });
+    expectOk(p, '推送内容');
+    const home = (await student('homeGet')).body;
+    ok(home.from_teacher[0].content.id === 'psy04' && home.from_teacher[0].teacher_name, '学生首页应出现老师推荐');
+    ok((await teacher('classPushList', { params: { id: fixtures.CLASS_ID } })).body.some((x) => x.id === p.body.id && typeof x.completed_count === 'number'), '老师能看到推送记录与看完人数');
+    ok((await teacher('classPush', { params: { id: fixtures.CLASS_ID }, body: { content_id: 'not-exist' } })).status === 404, '推送不存在的内容应 404');
+  });
+  await t('回访清单与家长的三分钟任务', async () => {
+    const f = (await teacher('followUps')).body;
+    ok(Array.isArray(f) && f.every((x) => x.student && x.what && x.due_at), '回访清单结构');
+    ok((await psy('followUps')).body.some((x) => x.from === 'case_plan'), '心理教师的回访清单应包含支持计划复盘');
+    expectOk(await parent('guardianTaskDone'), '家长完成任务');
+    ok((await parent('guardianSummary')).body.task.done === true, '家长摘要里任务应显示已完成');
+  });
+
+  group('十五、测评历史、规则、名册、公告');
+  await t('测评历史只有本人的、且不含娱乐量表；概览里人数不足 10 的不显示偏低人数', async () => {
+    const h = (await student('assessmentHistory')).body;
+    ok(h.length >= 1 && h.every((x) => x.kind !== 'entertainment' && x.headline), '学生的测评历史');
+    const o = (await psy('assessmentOverview')).body;
+    ok(o.instruments.length >= 4 && o.instruments.every((i) => (i.done_count < 10 ? i.low_count === null : typeof i.low_count === 'number')), '概览的小样本抑制');
+    ok(o.instruments.some((i) => i.low_count === null), '种子数据里应有一份完成人数不足 10 的问卷，用来演示抑制');
+    expectErr(await teacher('assessmentOverview'), 403, 'FORBIDDEN', '班主任查看测评概览');
+  });
+  await t('提示规则可以开关，但安全底线规则不能关', async () => {
+    const rules = (await leader('riskRuleList')).body;
+    ok(rules.length >= 5 && rules.every((r) => r.description.length > 10 && typeof r.dismissed_30d === 'number'), '规则列表应带人话说明与误报次数');
+    const soft = rules.find((r) => r.level === 'L1'), hard = rules.find((r) => r.level === 'L3');
+    ok((await leader('riskRuleUpdate', { params: { id: soft.id }, body: { enabled: false } })).body.enabled === false, '关闭一般规则');
+    await leader('riskRuleUpdate', { params: { id: soft.id }, body: { enabled: true } });
+    expectErr(await leader('riskRuleUpdate', { params: { id: hard.id }, body: { enabled: false } }), 409, 'CONFLICT', '关闭安全底线规则');
+    expectErr(await psy('riskRuleUpdate', { params: { id: soft.id }, body: { enabled: false } }), 403, 'FORBIDDEN', '心理教师修改规则');
+  });
+  await t('名册导入：先校验再导入，错误行逐条指出、不阻断整批', async () => {
+    const rows = [{ name: '演示甲', sno: 'G5304020001', class_name: '八年级（3）班', guardian_phone: '13900000001' }, { name: '演示乙', sno: '123', class_name: '八年级（3）班' }, { name: '', sno: 'G5304020003', class_name: '初二三班' }];
+    const p = (await sadmin('rosterPreview', { body: { rows } })).body;
+    ok(p.total === 3 && p.valid === 1 && p.errors.some((e) => e.row === 2 && e.field === '学籍号') && p.errors.filter((e) => e.row === 3).length >= 2, '预检应指出第 2、3 行的问题');
+    ok((await sadmin('rosterCommit', { body: { rows } })).body.imported === 1, '只导入合格的行');
+    expectErr(await teacher('rosterPreview', { body: { rows } }), 403, 'FORBIDDEN', '班主任导入名册');
+  });
+  await t('公告按对象分发', async () => {
+    const title = '验收：家长会时间';
+    expectOk(await ops('announcementCreate', { body: { title, body: '验收脚本创建', audience: 'guardians' } }), '发布公告');
+    ok((await parent('announcementList')).body.some((a) => a.title === title), '家长应看到');
+    ok(!(await student('announcementList')).body.some((a) => a.title === title), '学生不应看到发给家长的公告');
+    expectErr(await teacher('announcementCreate', { body: { title, body: 'x', audience: 'all' } }), 403, 'FORBIDDEN', '班主任发公告');
+  });
+
+  group('十六、导出审批、紧急访问、区域报告、帮助');
+  await t('导出要审批：不能自己批自己；批准后带水印、24 小时有效、最多下载 3 次', async () => {
+    const job = await leader('exportCreate', { body: { scope: 'case_summary', reason: '验收：联席会议材料' } });
+    expectOk(job, '申请导出');
+    ok(job.body.status === 'pending', '新申请应为待批准');
+    expectErr(await leader('exportApprove', { params: { id: job.body.id }, body: { approve: true } }), 403, 'FORBIDDEN', '批准自己的申请');
+    expectErr(await teacher('exportApprove', { params: { id: job.body.id }, body: { approve: true } }), 403, 'FORBIDDEN', '班主任批准导出');
+    const done = (await edu('exportApprove', { params: { id: job.body.id }, body: { approve: true } })).body;
+    ok(done.status === 'approved' && done.downloads_left === 3 && done.expires_at && done.watermark.includes('杨校长'), '批准后的有效期、次数与水印');
+    expectErr(await edu('exportApprove', { params: { id: job.body.id }, body: { approve: true } }), 409, 'CONFLICT', '重复批准');
+    ok((await auditor('exportList')).body.some((j) => j.id === job.body.id), '审计员应能看到导出记录');
+  });
+  await t('紧急访问：理由不少于 20 字、最长两小时、事后由审计员复核', async () => {
+    expectErr(await psy('breakGlass', { params: { id: 'ca1' }, body: { reason: '太短' } }), 422, 'VALIDATION_FAILED', '理由过短');
+    expectErr(await psy('breakGlass', { params: { id: 'ca1' }, body: { reason: '验收：学生深夜求助，需要立即查看既往记录以判断是否联系监护人。', minutes: 600 } }), 422, 'VALIDATION_FAILED', '超过两小时');
+    const g = await psy('breakGlass', { params: { id: 'ca1' }, body: { reason: '验收：学生深夜求助，需要立即查看既往记录以判断是否联系监护人。', minutes: 60 } });
+    expectOk(g, '发起紧急访问');
+    ok(g.body.reviewed === false && Date.parse(g.body.expires_at) - Date.now() <= 61 * 60000, '应记录到期时间且未复核');
+    ok((await auditor('accessGrantList')).body.some((x) => x.id === g.body.id), '审计员应看到这条记录');
+    ok((await auditor('accessGrantReview', { params: { id: g.body.id } })).body.reviewed === true, '审计员复核');
+    expectErr(await teacher('breakGlass', { params: { id: 'ca1' }, body: { reason: '验收：班主任不应有权限发起紧急访问，这里凑够二十个字。' } }), 403, 'FORBIDDEN', '班主任发起紧急访问');
+  });
+  await t('区域报告一键生成：有水印、分章节、不含学生信息', async () => {
+    const d = (await edu('regionDocument')).body;
+    ok(d.title && d.watermark && d.sections.length >= 4 && d.sections.every((s) => s.heading), '报告结构');
+    const raw = JSON.stringify(d);
+    ok(!fixtures.STUDENT_NAMES.some((n) => raw.includes(`${n}同学`) || raw.includes(`"${n}"`)) && /样本不足/.test(raw), '报告不含学生姓名，小样本学校标注“样本不足”');
+    expectErr(await teacher('regionDocument'), 403, 'FORBIDDEN', '班主任生成区域报告');
+  });
+  await t('系统状态、帮助中心、反馈、点赞', async () => {
+    const h = (await ops('systemHealth')).body;
+    ok(h.services.length >= 4 && h.queues.length >= 2 && h.uptime_30d > 0.9, '系统状态');
+    const sf = (await student('helpFaqs')).body, tf = (await teacher('helpFaqs')).body;
+    ok(sf.length >= 8 && tf.length >= 8 && sf[0].q !== tf[0].q, '帮助中心应按角色给出不同的问答');
+    expectOk(await student('feedbackCreate', { body: { kind: 'idea', text: '验收：希望活动提醒能提前一天。' } }), '提交反馈');
+    const a = (await student('postLike', { params: { id: 'p2' } })).body, b = (await student('postLike', { params: { id: 'p2' } })).body;
+    ok(a.liked === true && b.liked === false && a.like_count === b.like_count + 1, '点赞应可切换');
+  });
+
   console.log(`\n${failures.length ? '未通过' : '全部通过'}：${passed} 项通过，${failures.length} 项失败`);
   if (failures.length) { failures.forEach((f) => console.log(`  - ${f}`)); process.exit(1); }
 })().catch((e) => { console.error('\n验收脚本无法继续：', e.message, '\n请确认后端已启动，且种子数据里有全部演示账号。'); process.exit(2); });

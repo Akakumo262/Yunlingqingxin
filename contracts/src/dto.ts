@@ -6,6 +6,7 @@ import {
   NextStep, OBSERVATION_DIMENSIONS, OBSERVATION_SCENES, ObservationDimension, ObservationScene, PostStatus, PurposeCode, REPORT_REASONS,
   ReferralStatus, ReportReason, Role, SIGNAL_SOURCES, SignalSource, SupportLevel,
 } from './enums';
+import type { ActivityCard, ClassPush } from './dto-more';
 
 /**
  * 约定：JSON 字段一律 snake_case；时间 ISO 8601 UTC；id 为字符串。
@@ -140,14 +141,22 @@ export interface HomeFeed {
   today_check_in: CheckIn | null;
   /** 最近 7 天（含今天），没打卡的那天 mood 为 null。不返回“连续天数” */
   week: { date: string; mood: Mood | null }[];
-  micro_action: { id: string; title: string; minutes: number };
+  micro_action: { id: string; title: string; minutes: number; done?: boolean; edu?: FiveEdu };
   recommended: ContentCard[];
+  /** 班主任或心理老师推给全班的内容 */
+  from_teacher?: ClassPush[];
+  /** 正在进行的学习计划：今天该做哪一步 */
+  plan?: { id: string; title: string; day: number; days: number; next_title: string; done_today: boolean } | null;
+  /** 已报名或即将开始的活动，最多 3 个 */
+  activities?: ActivityCard[];
+  /** 未读通知数 */
+  unread?: number;
 }
 /** → passportGet 响应：成长护照（P-08） */
 export interface Passport {
   strengths: string[];
   stamps: { edu: FiveEdu; count: number }[];
-  records: { id: string; edu: FiveEdu; title: string; date: string; reflection?: string; witness?: string }[];
+  records: { id: string; edu: FiveEdu; title: string; date: string; reflection?: string; witness?: string; source?: 'self' | 'activity' | 'action' }[];
   /** 重要他人寄语 */
   messages: { from: string; text: string }[];
 }
@@ -156,8 +165,11 @@ export interface GuardianSummary {
   child: StudentBrief;
   week_text: string;
   suggestions: string[];
-  task: { title: string; minutes: number };
+  task: { title: string; minutes: number; done?: boolean };
   courses: ContentCard[];
+  /** 老师发来、还没回复的沟通单数 */
+  notes_unread?: number;
+  unread?: number;
   /** 仅危机处置期间出现：三步指引，不用恐吓性措辞 */
   crisis_notice: { text: string; steps: string[] } | null;
 }
@@ -174,6 +186,8 @@ export interface InstrumentBrief {
   intro: string;
   /** 非诊断声明；娱乐类为「非医学、非诊断、仅供自我了解」 */
   disclaimer: string;
+  /** 仅学生：上次做这份问卷的时间 */
+  last_done_at?: string;
 }
 /** → assessmentStart 请求 */
 export const AssessmentStartReq = z.object({ instrument_id: z.string().min(1) });
@@ -366,11 +380,19 @@ export interface ContentCard {
   age_label: string;
   status: ContentStatus;
   published_at?: string;
+  /** 用于搜索与“相关内容” */
+  tags?: string[];
+  /** 仅登录用户：是否已收藏、已看完 */
+  favorited?: boolean;
+  completed?: boolean;
 }
 /** → contentGet / contentCreate / contentReview 响应 */
 export interface ContentDetail extends ContentCard {
-  /** 正文，段落以 \n 分隔 */
+  /** 正文，一行一段。行首标记：「## 」小标题、「- 」要点、「> 」划重点；其余为普通段落 */
   body: string;
+  /** 文末“记住这几点” */
+  takeaways?: string[];
+  related?: ContentCard[];
   /** 短时效签名地址；演示素材来自隔离桶 */
   video_url?: string;
   author: string;
@@ -419,6 +441,8 @@ export interface AiChatRes {
   sources: { content_id: string; title: string }[];
   /** 每 5 轮为 true，前端提示“可以随时转人工” */
   remind_human: boolean;
+  /** 可以接着问的问题 */
+  suggestions?: string[];
 }
 
 // ════════ 成长圈 ════════
@@ -430,6 +454,8 @@ export interface Circle {
   intro: string;
   member_count: number;
   rules: string[];
+  post_count?: number;
+  last_post_at?: string;
 }
 /** → postList 响应为 Page<Post>（只含 published 与本人的 pending_review）；postCreate / postModerate 响应为 Post */
 export interface Post {
@@ -444,6 +470,8 @@ export interface Post {
   mine: boolean;
   created_at: string;
   replies: Post[];
+  like_count?: number;
+  liked?: boolean;
 }
 /** → postCreate 请求。学生前 3 条为 pending_review；含联系方式/链接等违规内容直接 422 */
 export const PostCreateReq = z.object({ content: z.string().min(1).max(500), parent_id: z.string().optional() });
@@ -508,6 +536,10 @@ export interface RegionReport {
   escr: number | null;
   trend: { month: string; new_focus: number; closure_rate: number }[];
   schools: { school_name: string; student_active_rate: number | null; teacher_active_rate: number | null; closure_rate: number | null; suppressed: boolean }[];
+  /** 五育活动参与率（聚合） */
+  five_edu?: { edu: FiveEdu; rate: number | null }[];
+  /** 提醒来源的构成（聚合） */
+  sources?: { label: string; count: number }[];
 }
 /** → supervisionList 响应为 SupervisionItem[]（P-19）。不含学生个体信息 */
 export interface SupervisionItem {

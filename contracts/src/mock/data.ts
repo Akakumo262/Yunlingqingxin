@@ -1,4 +1,11 @@
 import { Purpose, Role } from '../enums';
+import { PSYCHOLOGY } from './content/psychology';
+import { LEARNING } from './content/learning';
+import { CAREER, POLICY } from './content/career-policy';
+import { CULTURE, FIVE_EDU, ROLE_MODEL } from './content/culture-edu-model';
+import { PARENT, TEACHER } from './content/parent-teacher';
+import { MORE_CAREERS } from './content/careers';
+import { MORE_INSTRUMENTS } from './library-student';
 import type {
   CareerCard, Circle, ConsentItem, ContentDetail, Institution, Me, OrgNode, Passport, RegionReport, SupervisionItem, TalkScript, Tenant,
 } from '../dto';
@@ -25,7 +32,11 @@ const base = { tenant_id: TENANT_ID, school_name: SCHOOL_NAME };
 const klass = { class_id: CLASS_ID, class_name: CLASS_NAME };
 
 /** 学生名单（班级看板用）。s1 即 student01 */
-export const STUDENT_NAMES = ['青禾', '云舟', '小满', '松果', '星回', '阿朵', '石榴', '晚风', '禾木', '南星', '知夏', '山月'];
+export const STUDENT_NAMES = [
+  '青禾', '云舟', '小满', '松果', '星回', '阿朵', '石榴', '晚风', '禾木', '南星', '知夏', '山月',
+  '阿诺', '梨花', '白露', '青松', '朝颜', '木棉', '稻香', '云雀', '石头', '小鱼', '阿彩', '晨星',
+  '麦穗', '山茶', '流萤', '归雁', '春晓', '阿峰', '竹影', '知秋', '小禾', '北辰', '海棠', '远山',
+];
 export const studentId = (i: number) => `s${i + 1}`;
 
 export const USERS: MockUser[] = [
@@ -55,20 +66,11 @@ export const CONSENTS: ConsentItem[] = [
   { purpose: 'guardian_trend', title: '向家长开放心情趋势', description: '家长每周能看到你的整体状态。不打开时，家长只收到通用的陪伴建议。', required: false, granted: false, version: 'demo-1' },
 ];
 
-export const TALK_SCRIPTS: TalkScript[] = [
-  { id: 'ts1', scene: '开场', text: '我注意到你最近好像有点累，想不想聊聊？不想说也没关系。' },
-  { id: 'ts2', scene: '开场', text: '这几天课间很少见你出去，是有什么事压着吗？' },
-  { id: 'ts3', scene: '倾听', text: '嗯，我在听。你可以慢慢说，不用组织得很完整。' },
-  { id: 'ts4', scene: '倾听', text: '听起来这件事让你挺为难的，换了谁都会不好受。' },
-  { id: 'ts5', scene: '收尾', text: '不用马上回答，我周五课间再来找你，可以吗？' },
-  { id: 'ts6', scene: '收尾', text: '如果你愿意，我可以陪你一起去找心理老师坐一坐。' },
-  { id: 'ts7', scene: '和家长沟通', text: '孩子最近状态有些起伏，想和您一起看看家里能做点什么，不是来告状的。' },
-];
 
 const body = (...p: string[]) => p.join('\n');
 const pub = (daysAgo: number) => new Date(Date.now() - daysAgo * 86400000).toISOString();
 
-export const CONTENTS: ContentDetail[] = [
+const BASE_CONTENTS: ContentDetail[] = [
   {
     id: 'ct1', channel: 'learning', type: 'article', title: '考前睡不着，可以试试这三步', summary: '不是让你“别紧张”，而是给身体一个能照做的办法。', minutes: 3,
     source: '云岭青心内容组', author: '周老师（学校心理教师）', license: '自有内容', age_label: '初中—高中', status: 'published', published_at: pub(1), reviewed_by: '内容组 · 三审会签',
@@ -151,7 +153,7 @@ export const CONTENTS: ContentDetail[] = [
   },
 ];
 
-export const CAREER_CARDS: CareerCard[] = [
+const BASE_CAREERS: CareerCard[] = [
   { id: 'cc1', type: 'job', title: '护士', tagline: '离病人最近的人', region: '玉溪', source: '云岭青心生涯组整理', updated_at: '2026-10-20',
     sections: [{ heading: '典型的一天', text: '交接班、测体温量血压、配药打针、记录病情、安抚病人和家属。要一直站着，也要一直想着。' }, { heading: '怎么入门', text: '初中毕业可读中职护理，再升高职；也可读高中后考护理专科或本科。上岗前要通过护士执业资格考试。' }, { heading: '现在可以准备', text: '把生物和化学学扎实；假期去社区卫生站看看真实的工作是什么样。' }] },
   { id: 'cc2', type: 'job', title: '汽车维修技师', tagline: '听声音就知道哪坏了', region: '云南', source: '云岭青心生涯组整理', updated_at: '2026-10-12',
@@ -179,11 +181,6 @@ export const PASSPORT: Passport = {
   messages: [{ from: '李老师', text: '你认真的样子，全班都看得见。' }, { from: '妈妈', text: '菜地的照片我存在手机里了。' }],
 };
 
-export const CIRCLES: Circle[] = [
-  { id: 'cr1', type: 'class', name: '八（3）班的角落', intro: '只有本班同学和老师能看到。', member_count: 12, rules: ['用昵称发言', '不发联系方式和照片', '有话好好说'] },
-  { id: 'cr2', type: 'topic', name: '学习方法互助', intro: '把你试过管用的办法告诉大家。', member_count: 86, rules: ['全平台可见，全部匿名', '发帖先由版主看过', '不比分数，只聊方法'] },
-  { id: 'cr3', type: 'activity', name: '暑期成长营', intro: '团委和社区一起办的活动圈。', member_count: 34, rules: ['活动成员可见', '不发联系方式和照片'] },
-];
 
 export const INSTITUTIONS: Institution[] = [
   { id: 'in1', type: 'hospital', name: '演示区妇幼保健院临床心理科', intro: '儿童青少年情绪与行为问题的评估和治疗，可接收学校转介。', services: ['转介接收', '心理评估', '科普讲座'], district: '红塔区', status: 'approved' },
@@ -191,13 +188,17 @@ export const INSTITUTIONS: Institution[] = [
   { id: 'in3', type: 'social_work', name: '演示社会工作服务站', intro: '在社区开展青少年小组活动和假期陪伴。', services: ['小组活动', '假期陪伴', '入户探访'], district: '江川区', status: 'approved' },
   { id: 'in4', type: 'university', name: '演示大学朋辈志愿服务队', intro: '大学生志愿者，做学长答疑和活动带领。', services: ['学长答疑', '活动带领'], district: '昆明市', status: 'approved' },
   { id: 'in5', type: 'charity', name: '演示乡村儿童阅读公益项目', intro: '为乡镇学校配送图书并组织读书会。', services: ['图书角', '读书会'], district: '通海县', status: 'applied', license_no: '演示登记证 0005', contact_name: '项目专员' },
+  { id: 'in6', type: 'hospital', name: '演示县人民医院心理门诊', intro: '每周二、周四下午开诊，接收学校转介，可使用医保。', services: ['转介接收', '门诊评估'], district: '通海县', status: 'approved' },
+  { id: 'in7', type: 'charity', name: '演示青少年成长公益基金', intro: '为困难家庭学生提供助学支持，并资助乡镇学校的心理辅导室建设。', services: ['助学支持', '辅导室建设', '教师培训'], district: '玉溪市', status: 'approved' },
+  { id: 'in8', type: 'social_work', name: '演示儿童之家社工站', intro: '面向留守儿童开展周末陪伴、课后托管和家访。', services: ['周末陪伴', '课后托管', '家访'], district: '江川区', status: 'approved' },
+  { id: 'in9', type: 'counseling', name: '演示家庭教育指导中心', intro: '申请为家长提供线上课程和一对一指导。', services: ['家长课堂', '家庭指导'], district: '红塔区', status: 'applied', license_no: '演示登记证 0009', contact_name: '中心主任' },
 ];
 
 export const ORG_TREE: OrgNode[] = [
   { id: 'o-b', type: 'bureau', name: '演示市教育体育局', student_count: 3460, children: [
     { id: 'o-s1', type: 'school', name: '云岭演示中学', student_count: 1180, children: [
       { id: 'o-g7', type: 'grade', name: '七年级', student_count: 402 },
-      { id: 'o-g8', type: 'grade', name: '八年级', student_count: 396, children: [{ id: 'c1', type: 'class', name: CLASS_NAME, student_count: 12 }] },
+      { id: 'o-g8', type: 'grade', name: '八年级', student_count: 396, children: [{ id: 'c1', type: 'class', name: CLASS_NAME, student_count: 36 }] },
       { id: 'o-g9', type: 'grade', name: '九年级', student_count: 382 },
     ] },
     { id: 'o-s2', type: 'school', name: '演示第二中学', student_count: 1024 },
@@ -213,6 +214,8 @@ export const REGION_REPORT: Omit<RegionReport, 'updated_at'> = {
     { month: '2026-06', new_focus: 71, closure_rate: 0.64 }, { month: '2026-07', new_focus: 38, closure_rate: 0.69 }, { month: '2026-08', new_focus: 33, closure_rate: 0.72 },
     { month: '2026-09', new_focus: 62, closure_rate: 0.76 }, { month: '2026-10', new_focus: 54, closure_rate: 0.79 }, { month: '2026-11', new_focus: 46, closure_rate: 0.82 },
   ],
+  five_edu: [{ edu: 'moral', rate: 0.31 }, { edu: 'intellectual', rate: 0.52 }, { edu: 'physical', rate: 0.64 }, { edu: 'aesthetic', rate: 0.27 }, { edu: 'labor', rate: 0.43 }],
+  sources: [{ label: '学生主动求助', count: 9 }, { label: '心情记录规则', count: 14 }, { label: '状态问卷', count: 8 }, { label: '教师观察', count: 13 }, { label: '助手与圈子', count: 2 }],
   schools: [
     { school_name: '云岭演示中学', student_active_rate: 0.58, teacher_active_rate: 0.61, closure_rate: 0.85, suppressed: false },
     { school_name: '演示第二中学', student_active_rate: 0.49, teacher_active_rate: 0.52, closure_rate: 0.8, suppressed: false },
@@ -235,7 +238,7 @@ export const TENANTS: Tenant[] = [
 ];
 
 /** 自编非诊断问卷（不使用任何需授权的量表原文） */
-export const INSTRUMENTS = [
+const BASE_INSTRUMENTS = [
   {
     id: 'ins1', code: 'growth-state', name: '成长状态小问卷', kind: 'development' as const, minutes: 4,
     intro: '看看最近两周，你在学习、朋友、心情和身体这几件事上感觉怎么样。',
@@ -277,3 +280,23 @@ export const CRISIS_WORDS = ['不想活', '想死', '去死', '自杀', '伤害�
 export const AI_CRISIS_REPLY = '谢谢你告诉我。你现在的感受很重要，我已经帮你联系老师了，他们会尽快找到你。在这之前，如果情况紧急，请马上拨打 12355，或者去找身边任何一位你信任的大人。';
 /** 成长圈违规内容：联系方式、外链、拉群等（CM-04） */
 export const POST_BANNED = [/1\d{10}/, /微信|vx|加我|QQ|qq群|拉群|二维码/i, /https?:\/\/|www\./i];
+
+// ════════ 合并内容库 ════════
+/** 最早写的 13 条内容补上标签，和内容库的格式对齐 */
+const BASE_TAGS: Record<string, string[]> = {
+  ct1: ['考试', '睡眠', '紧张', '失眠'], ct2: ['父母', '吵架', '家庭', '沟通'], ct3: ['返乡', '电商', '创业'], ct4: ['助学金', '资助', '高中', '申请'],
+  ct5: ['梯田', '哈尼族', '民族文化'], ct6: ['睡眠', '放松', '身体扫描'], ct7: ['课间', '运动', '体育'], ct8: ['中职', '高职', '本科', '升学'],
+  ct9: ['留守', '电话', '家长', '沟通'], ct10: ['谈话', '教师', '开场'], ct11: ['朋友', '同学', '人际'], ct12: ['汽修', '职业体验'], ct13: ['放松', '音频'],
+};
+/** 全部内容：约 115 条，覆盖 9 个频道 */
+export const CONTENTS: ContentDetail[] = [
+  ...BASE_CONTENTS.map((c) => ({ ...c, tags: BASE_TAGS[c.id] ?? [] })),
+  ...PSYCHOLOGY, ...LEARNING, ...CAREER, ...POLICY, ...CULTURE, ...FIVE_EDU, ...ROLE_MODEL, ...PARENT, ...TEACHER,
+];
+/** 全部生涯卡：48 张（职业 18、行业 12、专业 11、人物 7） */
+export const CAREER_CARDS: CareerCard[] = [...BASE_CAREERS, ...MORE_CAREERS];
+/** 全部问卷：8 份，其中 3 份是“轻松一下” */
+export const INSTRUMENTS = [...BASE_INSTRUMENTS, ...MORE_INSTRUMENTS];
+
+export * from './library-student';
+export * from './library-staff';
