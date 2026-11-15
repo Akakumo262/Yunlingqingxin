@@ -34,6 +34,21 @@ npm.cmd run seed:content -w @yunling/backend
 当前只建立来源审核与元数据边界，不会自动抓取网页；只有人工核验后将
 `source_verified` 设为 `true` 的记录才会向内容接口附加外链。
 
+需要导入一篇公开资源时，使用受白名单和 `robots.txt` 约束的导入脚本。它会计算
+SHA-256 内容哈希、按 URL/哈希去重，且始终以 `source_verified=false` 写入，不能绕过人工审核：
+
+```powershell
+npm.cmd run import:content -w @yunling/backend -- `
+  --url https://www.gov.cn/example/article.html `
+  --content-id ct-gov-001 `
+  --kind policy `
+  --audience 大学生,高中生 `
+  --title "资源标题" `
+  --summary "人工填写的摘要"
+```
+
+先检查而不写入数据库可追加 `--dry-run`。脚本拒绝未登记来源、robots 禁止的路径、跨域跳转和超过 2 MB 的响应。
+
 ## 验收
 
 另开一个终端，在后端已经启动后执行：
