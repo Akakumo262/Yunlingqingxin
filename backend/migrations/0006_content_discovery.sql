@@ -2,7 +2,6 @@
 -- 内容正文仍由 cnt.content_item 管理；此表使用契约中的字符串 id，
 -- 便于先与现有 mock/导入数据联调，再逐步迁移到 UUID 内容主表。
 CREATE SCHEMA IF NOT EXISTS cnt;
-CREATE SCHEMA IF NOT EXISTS cnt;
 CREATE TABLE IF NOT EXISTS cnt.content_source (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text NOT NULL,
@@ -40,9 +39,6 @@ CREATE INDEX IF NOT EXISTS ix_content_discovery_source
 
 COMMENT ON TABLE cnt.content_source IS '可追溯内容来源；只有人工审核后才允许作为已验证来源';
 COMMENT ON TABLE cnt.content_discovery IS '学生发现流的外部资源与受众元数据，不存抓取正文';
-
-GRANT USAGE ON SCHEMA cnt TO yunling_app;
-GRANT SELECT ON cnt.content_source, cnt.content_discovery TO yunling_app;
 
 GRANT USAGE ON SCHEMA cnt TO yunling_app;
 GRANT SELECT ON cnt.content_source, cnt.content_discovery TO yunling_app;
