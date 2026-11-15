@@ -377,6 +377,16 @@ export interface ContentCard {
   /** 阅读/观看分钟数 */
   minutes: number;
   source: string;
+  /** 外部原文地址；未完成来源审核时为空 */
+  external_url?: string;
+  /** 是否已按来源白名单和人工审核核验 */
+  source_verified?: boolean;
+  /** 发现流分类：AI 资讯、竞赛、志愿、政策等 */
+  discover_kind?: 'ai_insight' | 'competition' | 'volunteer' | 'policy' | 'career' | 'activity' | 'other';
+  /** 面向的学生阶段，例如大学生、高中生 */
+  audience_stages?: string[];
+  deadline?: string;
+  location?: string;
   age_label: string;
   status: ContentStatus;
   published_at?: string;
