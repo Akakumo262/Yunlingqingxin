@@ -4,9 +4,9 @@
 
 | 目录 | 内容 | 端口 | 状态 |
 |---|---|---|---|
-| `contracts/` | 前后端共用契约：59 个接口、类型、合成数据、模拟后端、验收脚本 | 3000（模拟后端） | 完成 |
-| `frontend/web/` | 教师端 + 管理端（React + Ant Design） | 5173 | 完成 |
-| `frontend/miniapp/` | 学生端 + 家长端（Taro 微信小程序 + H5） | 10086 | 完成，待真机验证 |
+| `contracts/` | 前后端共用契约：118 个接口、类型、合成内容库、模拟后端、68 项验收 | 3000（模拟后端） | 完成 |
+| `frontend/web/` | 教师端 + 管理端（React + Ant Design），26 个页面 | 5173 | 完成 |
+| `frontend/miniapp/` | 学生端 + 家长端（Taro 微信小程序 + H5），18 个页面 | 10086 | 完成，待真机验证 |
 | `backend/` | 后端（NestJS + PostgreSQL） | 3000 | 起步骨架，待开发 |
 
 ## 快速开始
@@ -26,6 +26,17 @@ npm run dev:h5      # 打开 http://localhost:10086，浏览器切到手机尺�
 ```
 
 不启动模拟后端也能运行，前端会自动改用内置的演示数据。
+
+## 演示时可以这样走一遍
+
+先 `npm run mock`，再同时打开 Web 和小程序 H5，两边连的是同一份数据：
+
+1. 小程序“我是学生”：选心情天气 → 做完今天的小行动（成长护照多一枚印记）→ 发现里报名一场活动。
+2. Web“班主任”：五育活动里打开这场活动，把签到码念给学生；学生签到、写两句话；老师点“做见证”。学生的成长护照里出现老师的名字。
+3. Web“班主任”：内容与话术里挑一篇“推荐给全班”。学生首页出现“老师推荐”，通知里多一条。
+4. 小程序学生点“我想找人说”。Web 班主任的今日待办立刻出现一条紧急提醒；点“我来跟进”，学生那边的进度变成“老师看到了”。
+5. Web“班主任”给家长发一张沟通单 → 小程序“我是家长”回一句 → 班主任收到通知。
+6. Web“校领导”对一条个案发起紧急访问 → Web“安全审计”复核。
 
 ## 文档
 
@@ -48,7 +59,7 @@ git clone https://github.com/Akakumo262/Yunlingqingxin.git
 cd Yunlingqingxin
 npm install            # 网络不稳可加 --registry=https://registry.npmmirror.com
 npm run mock           # 终端一：模拟后端，3000 端口
-npm run accept         # 终端二：应看到 43 项全部通过
+npm run accept         # 终端二：应看到 68 项全部通过
 git checkout -b backend/dev
 ```
 
@@ -69,7 +80,7 @@ git checkout -b backend/dev
 `contracts/` 是两边共用的，规则见 `docs/前后端对齐契约.md` 第 8 节。流程：
 
 1. 改 `contracts/src/`，同步改 `contracts/src/mock/`。
-2. 执行 `npm run mock` 和 `npm run accept`，确认仍然 43 项全过。
+2. 执行 `npm run mock` 和 `npm run accept`，确认仍然 68 项全过。
 3. 单独提交并推送，告诉对方。
 4. 对方 `git pull` 后执行 `npm run build:contracts`。
 
@@ -84,4 +95,4 @@ git checkout -b backend/dev
 
 ### 给后端 AI 的一句话提示词
 
-> 你是这个仓库的后端负责人。请先完整阅读根目录的 AGENTS.md 和 docs/后端交接说明.md，然后独立完成 backend/ 的全部开发，直到根目录 `npm run accept` 对着你的真实后端 43 项全部通过并满足交接说明第 4 节；过程中不需要向我确认，遇到取舍按交接说明第 6 节的规则自己决定，做完再汇报。
+> 你是这个仓库的后端负责人。请先完整阅读根目录的 AGENTS.md 和 docs/后端交接说明.md，然后独立完成 backend/ 的全部开发，直到根目录 `npm run accept` 对着你的真实后端 68 项全部通过并满足交接说明第 4 节；过程中不需要向我确认，遇到取舍按交接说明第 6 节的规则自己决定，做完再汇报。
